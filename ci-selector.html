@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CI Method Selector · TAQA LEAD</title>
+<style>
+:root{--teal:#0F6E56;--teal-lt:#D6F0E8;--teal-xl:#EEF8F4;--orange:#E87722;--orange-lt:#FEF3EA;--purple:#6C3483;--purple-lt:#F4EEF9;--blue:#1A5276;--blue-lt:#EAF1F8;--dark:#1A1A2E;--mid:#3D3D3D;--light:#777;--grey:#F4F5F7;--border:#E2E5E8;--white:#fff;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--grey);color:var(--mid);min-height:100vh;}
+header{background:var(--dark);padding:16px 24px;display:flex;align-items:center;gap:16px;}
+.badge{background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;letter-spacing:.06em;}
+header h1{color:#fff;font-size:18px;font-weight:600;}
+header span{color:#aaa;font-size:13px;margin-left:auto;}
+.container{max-width:760px;margin:0 auto;padding:32px 20px;}
+
+/* Progress bar */
+.progress-bar{display:flex;gap:6px;margin-bottom:32px;}
+.step{flex:1;height:4px;border-radius:2px;background:var(--border);transition:background .3s;}
+.step.done{background:var(--teal);}
+.step.active{background:var(--orange);}
+
+/* Question card */
+.question-card{background:#fff;border-radius:12px;border:1.5px solid var(--border);padding:32px;margin-bottom:20px;animation:fadeUp .25s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.q-label{font-size:11px;font-weight:700;color:var(--teal);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;}
+.q-text{font-size:20px;font-weight:600;color:var(--dark);line-height:1.4;margin-bottom:24px;}
+.q-sub{font-size:14px;color:var(--light);margin-top:-16px;margin-bottom:20px;line-height:1.5;}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;}
+.btn{padding:12px 24px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:14px;font-weight:600;color:var(--mid);transition:all .15s;display:flex;align-items:center;gap:8px;}
+.btn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-xl);}
+.btn.selected{border-color:var(--teal);background:var(--teal);color:#fff;}
+.btn-icon{font-size:16px;}
+
+/* Result card */
+.result-card{border-radius:12px;overflow:hidden;animation:fadeUp .3s ease;}
+.result-header{padding:28px 32px;color:#fff;}
+.result-header h2{font-size:28px;font-weight:700;margin-bottom:6px;}
+.result-header p{font-size:14px;opacity:.85;line-height:1.5;}
+.result-body{background:#fff;padding:28px 32px;border:1.5px solid var(--border);border-top:none;border-radius:0 0 12px 12px;}
+.result-section{margin-bottom:24px;}
+.result-section:last-child{margin-bottom:0;}
+.rs-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
+.rs-text{font-size:15px;color:var(--mid);line-height:1.6;}
+.steps-list{list-style:none;padding:0;}
+.steps-list li{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--mid);}
+.steps-list li:last-child{border-bottom:none;}
+.step-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px;}
+.taqa-example{background:var(--teal-xl);border:1px solid var(--teal-lt);border-radius:8px;padding:16px 20px;margin-top:8px;}
+.taqa-example p{font-size:14px;color:#085041;line-height:1.6;}
+.taqa-example strong{color:var(--teal);}
+.restart-btn{display:inline-flex;align-items:center;gap:8px;margin-top:24px;padding:12px 24px;background:var(--grey);border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;color:var(--mid);transition:all .15s;}
+.restart-btn:hover{background:var(--dark);color:#fff;border-color:var(--dark);}
+
+/* Chain summary */
+.chain{background:var(--grey);border-radius:8px;padding:16px 20px;margin-top:16px;}
+.chain-item{display:flex;align-items:flex-start;gap:10px;padding:6px 0;font-size:13px;color:var(--mid);}
+.chain-q{color:var(--light);font-size:11px;font-weight:700;min-width:80px;margin-top:2px;}
+.chain-a{color:var(--dark);}
+.chain-arrow{color:var(--border);margin:0 8px;}
+
+footer{text-align:center;padding:24px;font-size:12px;color:var(--light);}
+footer a{color:var(--teal);text-decoration:none;}
+</style>
+</head>
+<body>
+<header>
+  <span class="badge">T6</span>
+  <h1>CI Method Selector</h1>
+  <span>TAQA LEAD · Module 2</span>
+</header>
+
+<div class="container">
+  <div class="progress-bar" id="progress"></div>
+  <div id="app"></div>
+</div>
+
+<footer>TAQA LEAD Programme · Module 2 · Operational Excellence Dynamics · Built by <a href="#">VectorEd</a></footer>
+
+<script>
+const QUESTIONS = [
+  {
+    id: 'q1',
+    label: 'Question 1 of 4',
+    text: 'Is this problem recurring — does it keep coming back?',
+    sub: 'A recurring problem is one your team has tried to fix before, or one that happens repeatedly despite attempts to resolve it.',
+    options: [
+      { text: 'Yes — it keeps returning', value: 'recurring', icon: '🔄' },
+      { text: 'No — it is new or one-off', value: 'new', icon: '✨' },
+    ]
+  },
+  {
+    id: 'q2',
+    label: 'Question 2 of 4',
+    text: 'Do you have data that measures the problem precisely?',
+    sub: 'For example: fault counts, downtime hours, error rates, backlog numbers. Data that lets you define "how much" of a problem exists.',
+    options: [
+      { text: 'Yes — I have data I can measure', value: 'data', icon: '📊' },
+      { text: 'No — the problem is more qualitative', value: 'nodata', icon: '🗣️' },
+    ]
+  },
+  {
+    id: 'q3',
+    label: 'Question 3 of 4',
+    text: 'Can your team fix this in a focused 1–5 day event?',
+    sub: 'A focused event means bringing the team together, mapping the current process, and implementing changes in a short sprint — without needing weeks of data analysis.',
+    options: [
+      { text: 'Yes — we can fix it together quickly', value: 'fast', icon: '⚡' },
+      { text: 'No — it needs deeper structured analysis', value: 'slow', icon: '🔬' },
+    ]
+  },
+  {
+    id: 'q4',
+    label: 'Question 4 of 4',
+    text: 'Is this primarily about eliminating waste in a specific process?',
+    sub: 'Waste means unnecessary steps, waiting, rework, or duplication. If you can point to a specific process and say "this step should not exist", that is waste elimination.',
+    options: [
+      { text: 'Yes — there is clear process waste', value: 'waste', icon: '🗑️' },
+      { text: 'No — it is more about variation or defects', value: 'variation', icon: '📉' },
+    ]
+  },
+];
+
+const METHODS = {
+  PDCA: {
+    name: 'PDCA',
+    tagline: 'Plan · Do · Check · Act',
+    color: '#0F6E56',
+    colorLt: '#EEF8F4',
+    when: 'Use PDCA for iterative, low-complexity improvements where you can test a small change quickly and measure the result. Best when the problem is relatively contained and you have a clear hypothesis about what to change.',
+    steps: [
+      { num: 1, text: 'Plan — Define the problem, state your hypothesis, and design the smallest test that would confirm it.' },
+      { num: 2, text: 'Do — Run the trial. Keep it small and time-boxed so you can reverse it if it does not work.' },
+      { num: 3, text: 'Check — Measure what happened against what you predicted. Note surprises and deviations.' },
+      { num: 4, text: 'Act — If it worked: standardise and share. If it did not: revise your hypothesis and loop back to Plan.' },
+    ],
+    example: '<strong>TAQA example:</strong> Your team\'s end-of-shift handover notes are incomplete. You hypothesise that adding a five-question checklist to the handover template will reduce missed items. Run it for two weeks, check whether missed items decreased, then standardise if it worked.',
+    timeframe: '1–4 weeks per cycle',
+  },
+  DMAIC: {
+    name: 'DMAIC',
+    tagline: 'Define · Measure · Analyse · Improve · Control',
+    color: '#6C3483',
+    colorLt: '#F4EEF9',
+    when: 'Use DMAIC for recurring, data-measurable problems where the root cause is unknown and you need structured analysis to find it. Best when the problem has been present for a long time and simple fixes have not held.',
+    steps: [
+      { num: 1, text: 'Define — State the problem precisely: what is happening, who is affected, what does good look like, and what is the financial or operational impact.' },
+      { num: 2, text: 'Measure — Establish a baseline. How often does the problem occur? How severe is it? What data exists?' },
+      { num: 3, text: 'Analyse — Use data and root cause tools (5 Whys, Fishbone, Pareto) to identify the true cause — not symptoms.' },
+      { num: 4, text: 'Improve — Design, test, and implement solutions that address the root cause. Run a pilot before full rollout.' },
+      { num: 5, text: 'Control — Sustain the gain. Put monitoring, standards, and accountability in place so the problem cannot return.' },
+    ],
+    example: '<strong>TAQA example:</strong> Unplanned fault responses at your substations have been rising for 18 months. You have work order data. DMAIC would define the defect precisely, measure fault frequency by asset type, analyse which assets and conditions drive the most faults, improve through targeted maintenance changes, and control via a new monitoring protocol.',
+    timeframe: '4–12 weeks',
+  },
+  KAIZEN: {
+    name: 'Kaizen',
+    tagline: 'Focused · Team-Led · Fast',
+    color: '#1A5276',
+    colorLt: '#EAF1F8',
+    when: 'Use Kaizen for targeted waste elimination in a specific, visible process. Best when the team already knows what the waste is and just needs dedicated time and permission to fix it together.',
+    steps: [
+      { num: 1, text: 'Identify — Select the specific process and name the type of waste (waiting, rework, unnecessary steps, excess movement, over-processing).' },
+      { num: 2, text: 'Observe — Map the current state as a team. Walk the process physically if possible. Do not assume — observe.' },
+      { num: 3, text: 'Improve — Team generates solutions together. Test the most promising ones immediately within the event. Move fast.' },
+      { num: 4, text: 'Standardise — Document the new way. Update SOPs, briefing materials, and training. Make the improved process the default.' },
+      { num: 5, text: 'Review — Check the improvement after 30 days. Did the waste return? What still needs adjusting?' },
+    ],
+    example: '<strong>TAQA example:</strong> Your team\'s work order closure process involves three manual sign-off steps that take 2–3 days each. Everyone knows the process is slow but no one has fixed it. A two-day Kaizen event maps the current state, removes the redundant step, and implements same-day digital approval — the team does it together and owns the result.',
+    timeframe: '1–5 days for the event, 30-day review',
+  },
+};
+
+let state = { answers: {}, current: 0, result: null };
+
+function getResult(answers) {
+  if (answers.q1 === 'new') return 'PDCA';
+  if (answers.q2 === 'data' && answers.q3 === 'slow') return 'DMAIC';
+  if (answers.q3 === 'fast' && answers.q4 === 'waste') return 'KAIZEN';
+  if (answers.q3 === 'fast') return 'KAIZEN';
+  if (answers.q2 === 'data') return 'DMAIC';
+  return 'PDCA';
+}
+
+function getVisibleQuestions() {
+  const qs = [QUESTIONS[0]];
+  if (state.answers.q1 === 'recurring') {
+    qs.push(QUESTIONS[1]);
+    if (state.answers.q2) {
+      qs.push(QUESTIONS[2]);
+      if (state.answers.q3 === 'fast') qs.push(QUESTIONS[3]);
+    }
+  }
+  return qs;
+}
+
+function render() {
+  const prog = document.getElementById('progress');
+  const app = document.getElementById('app');
+  const visQ = getVisibleQuestions();
+  const answered = Object.keys(state.answers).length;
+  const total = 4;
+
+  // Progress
+  prog.innerHTML = Array.from({length:4},(_,i)=>
+    `<div class="step ${i<answered?'done':i===answered?'active':''}"></div>`
+  ).join('');
+
+  if (state.result) {
+    const m = METHODS[state.result];
+    app.innerHTML = `
+      <div class="result-card">
+        <div class="result-header" style="background:${m.color}">
+          <h2>${m.name}</h2>
+          <p>${m.tagline}</p>
+        </div>
+        <div class="result-body">
+          <div class="result-section">
+            <div class="rs-label" style="color:${m.color}">When to use this method</div>
+            <div class="rs-text">${m.when}</div>
+          </div>
+          <div class="result-section">
+            <div class="rs-label" style="color:${m.color}">Key steps</div>
+            <ul class="steps-list">
+              ${m.steps.map(s=>`<li><div class="step-num" style="background:${m.color}">${s.num}</div><span>${s.text}</span></li>`).join('')}
+            </ul>
+          </div>
+          <div class="result-section">
+            <div class="rs-label" style="color:${m.color}">TAQA example</div>
+            <div class="taqa-example"><p>${m.example}</p></div>
+          </div>
+          <div class="result-section">
+            <div class="rs-label" style="color:${m.color}">Typical timeframe</div>
+            <div class="rs-text">${m.timeframe}</div>
+          </div>
+          <div class="result-section">
+            <div class="rs-label" style="color:#777">Your decision path</div>
+            <div class="chain">
+              ${Object.entries(state.answers).map(([k,v])=>{
+                const q = QUESTIONS.find(q=>q.id===k);
+                const opt = q?.options.find(o=>o.value===v);
+                return `<div class="chain-item"><span class="chain-q">${k.toUpperCase()}</span><span class="chain-a">${opt?.text||v}</span></div>`;
+              }).join('<div style="border-left:2px solid var(--border);margin-left:40px;height:8px;"></div>')}
+            </div>
+          </div>
+          <button class="restart-btn" onclick="restart()">↩ Start again with a different problem</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  let html = '';
+  visQ.forEach((q, i) => {
+    const isActive = i === visQ.length - 1 && !state.answers[q.id];
+    const isAnswered = !!state.answers[q.id];
+    if (!isActive && !isAnswered) return;
+    html += `<div class="question-card">
+      <div class="q-label">${q.label}</div>
+      <div class="q-text">${q.text}</div>
+      ${q.sub ? `<div class="q-sub">${q.sub}</div>` : ''}
+      <div class="btn-row">
+        ${q.options.map(opt=>`
+          <button class="btn ${state.answers[q.id]===opt.value?'selected':''}" onclick="answer('${q.id}','${opt.value}')">
+            <span class="btn-icon">${opt.icon}</span>${opt.text}
+          </button>`).join('')}
+      </div>
+    </div>`;
+  });
+
+  // Show next unanswered question
+  const nextQ = visQ.find(q => !state.answers[q.id]);
+  if (nextQ) {
+    html += `<div class="question-card" style="${visQ.indexOf(nextQ)>0?'':''}">
+      <div class="q-label">${nextQ.label}</div>
+      <div class="q-text">${nextQ.text}</div>
+      ${nextQ.sub ? `<div class="q-sub">${nextQ.sub}</div>` : ''}
+      <div class="btn-row">
+        ${nextQ.options.map(opt=>`
+          <button class="btn" onclick="answer('${nextQ.id}','${opt.value}')">
+            <span class="btn-icon">${opt.icon}</span>${opt.text}
+          </button>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  app.innerHTML = html;
+}
+
+function answer(qId, value) {
+  state.answers[qId] = value;
+  // Clear downstream answers if this changes the tree
+  if (qId === 'q1') { delete state.answers.q2; delete state.answers.q3; delete state.answers.q4; }
+  if (qId === 'q2') { delete state.answers.q3; delete state.answers.q4; }
+  if (qId === 'q3') { delete state.answers.q4; }
+
+  // Check if we have enough to decide
+  if (value === 'new') { state.result = 'PDCA'; render(); return; }
+  const a = state.answers;
+  if (a.q2 === 'data' && a.q3 === 'slow') { state.result = 'DMAIC'; render(); return; }
+  if (a.q3 === 'fast' && a.q4) { state.result = a.q4 === 'waste' ? 'KAIZEN' : 'PDCA'; render(); return; }
+  if (a.q2 === 'nodata' && a.q3 === 'fast' && !a.q4) { /* need q4 */ render(); return; }
+  if (a.q2 === 'nodata' && a.q3 === 'slow') { state.result = 'PDCA'; render(); return; }
+  render();
+}
+
+function restart() {
+  state = { answers: {}, current: 0, result: null };
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

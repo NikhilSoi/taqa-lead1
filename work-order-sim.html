@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Work Order Backlog Simulation · TAQA LEAD</title>
+<style>
+:root{--teal:#0F6E56;--teal-lt:#D6F0E8;--teal-xl:#EEF8F4;--orange:#E87722;--orange-lt:#FEF3EA;--red:#C0392B;--red-lt:#FDEDEC;--green:#1A7A5E;--dark:#1A1A2E;--mid:#3D3D3D;--light:#777;--grey:#F4F5F7;--border:#E2E5E8;--white:#fff;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--grey);color:var(--mid);}
+header{background:var(--dark);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.badge{background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.06em;}
+header h1{color:#fff;font-size:17px;font-weight:600;flex:1;}
+.header-tag{color:#aaa;font-size:12px;}
+
+/* Stats bar */
+.stats-bar{background:var(--dark);border-top:1px solid #333;padding:10px 20px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.stat{text-align:center;}
+.stat-val{font-size:26px;font-weight:700;color:#fff;line-height:1;}
+.stat-label{font-size:10px;color:#aaa;margin-top:4px;text-transform:uppercase;letter-spacing:.05em;}
+.stat-val.highlight{color:var(--orange);}
+.stat-val.formula{font-size:13px;color:#aaa;margin-top:6px;}
+
+/* Board */
+.board{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:16px;min-height:380px;}
+.lane{background:#fff;border-radius:10px;border:1.5px solid var(--border);display:flex;flex-direction:column;min-height:340px;}
+.lane-hdr{padding:10px 12px;border-radius:8px 8px 0 0;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-bottom:2px solid var(--border);}
+.lane-1 .lane-hdr{background:var(--teal-xl);color:var(--teal);border-bottom-color:var(--teal-lt);}
+.lane-2 .lane-hdr{background:#EAF1F8;color:#1A5276;border-bottom-color:#BDD4E7;}
+.lane-3 .lane-hdr{background:#F9F0FB;color:#6C3483;border-bottom-color:#D7B8EF;}
+.lane-4 .lane-hdr{background:var(--orange-lt);color:var(--orange);border-bottom-color:#F5C6A0;}
+.lane-5 .lane-hdr{background:#EAFAF1;color:#1A7A5E;border-bottom-color:#A9DFBF;}
+.lane-hdr .lane-count{float:right;background:rgba(0,0,0,.08);border-radius:10px;padding:0 6px;font-size:11px;}
+.lane-body{padding:8px;flex:1;display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:280px;}
+
+/* Job cards */
+.job-card{border-radius:6px;padding:8px 10px;font-size:12px;border:1px solid;animation:cardIn .2s ease;}
+@keyframes cardIn{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
+.job-card.normal{background:#fff;border-color:var(--border);color:var(--mid);}
+.job-card.priority{background:#FFF8E7;border-color:#F0A500;color:#7D4E00;}
+.job-card.held{background:var(--red-lt);border-color:var(--red);color:var(--red);opacity:.8;}
+.job-id{font-weight:700;font-size:11px;margin-bottom:2px;}
+.job-desc{color:var(--light);font-size:11px;line-height:1.3;}
+.job-time{font-size:10px;color:var(--light);margin-top:4px;}
+.job-tag{display:inline-block;font-size:9px;padding:1px 5px;border-radius:3px;font-weight:700;margin-top:3px;}
+.job-tag.priority{background:#F0A500;color:#fff;}
+.job-tag.held{background:var(--red);color:#fff;}
+
+/* Controls */
+.controls{background:#fff;border-top:2px solid var(--border);padding:14px 20px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+.ctrl-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.ctrl-label{font-size:12px;font-weight:600;color:var(--light);white-space:nowrap;}
+.btn{padding:8px 16px;border-radius:7px;border:1.5px solid;cursor:pointer;font-size:13px;font-weight:600;transition:all .15s;white-space:nowrap;}
+.btn-primary{background:var(--teal);border-color:var(--teal);color:#fff;}
+.btn-primary:hover{background:#0d5e49;}
+.btn-disrupt{background:var(--orange-lt);border-color:var(--orange);color:var(--orange);}
+.btn-disrupt:hover{background:var(--orange);color:#fff;}
+.btn-danger{background:var(--red-lt);border-color:var(--red);color:var(--red);}
+.btn-danger:hover{background:var(--red);color:#fff;}
+.btn-secondary{background:var(--grey);border-color:var(--border);color:var(--mid);}
+.btn-secondary:hover{background:var(--dark);color:#fff;border-color:var(--dark);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.speed-row{display:flex;align-items:center;gap:6px;}
+.speed-btn{width:34px;height:28px;border-radius:5px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:12px;font-weight:700;color:var(--mid);}
+.speed-btn.active{background:var(--dark);color:#fff;border-color:var(--dark);}
+
+/* Log */
+.log-panel{background:var(--dark);padding:8px 20px 12px;max-height:90px;overflow-y:auto;}
+.log-entry{font-size:11px;color:#aaa;padding:2px 0;border-bottom:1px solid #333;display:flex;gap:8px;}
+.log-time{color:var(--teal);font-family:monospace;flex-shrink:0;}
+.log-entry.event{color:#f0c070;}
+.log-entry.complete{color:#7DCEA0;}
+.log-entry.disrupt{color:var(--orange);}
+
+/* Little's law overlay */
+.littles-badge{background:var(--teal-xl);border:1.5px solid var(--teal-lt);border-radius:8px;padding:10px 16px;margin:0 16px 8px;font-size:13px;color:var(--teal);display:flex;align-items:center;gap:10px;}
+.littles-badge strong{font-size:15px;}
+
+footer{text-align:center;padding:12px;font-size:11px;color:var(--light);}
+footer a{color:var(--teal);text-decoration:none;}
+
+@media(max-width:700px){
+  .board{grid-template-columns:repeat(3,1fr);}
+  .stats-bar{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+<header>
+  <span class="badge">D1·05</span>
+  <h1>Work Order Backlog Simulation</h1>
+  <span class="header-tag">TAQA LEAD · Module 2</span>
+</header>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-val" id="stat-wip">0</div><div class="stat-label">Jobs in System (WIP)</div></div>
+  <div class="stat"><div class="stat-val" id="stat-throughput">0.0</div><div class="stat-label">Completed / min (λ)</div></div>
+  <div class="stat"><div class="stat-val highlight" id="stat-leadtime">—</div><div class="stat-label">Lead Time — Little's Law</div></div>
+  <div class="stat"><div class="stat-val" id="stat-done">0</div><div class="stat-label">Total Completed</div></div>
+</div>
+
+<div class="littles-badge">
+  <span>📐 Little's Law:</span>
+  <strong>Lead Time = WIP ÷ Throughput</strong>
+  <span style="color:var(--light);font-size:12px;margin-left:4px;">· Watch this update live as jobs build up</span>
+</div>
+
+<div class="board" id="board"></div>
+
+<div class="controls">
+  <div class="ctrl-group">
+    <span class="ctrl-label">Add jobs:</span>
+    <button class="btn btn-primary" onclick="addJob(false)">+ Add Fault</button>
+    <button class="btn btn-primary" onclick="addJob(true)" style="background:#7D4E00;border-color:#7D4E00;">⚡ Add Priority Fault</button>
+  </div>
+  <div class="ctrl-group">
+    <span class="ctrl-label">Disruptions:</span>
+    <button class="btn btn-disrupt" onclick="disruptPriority()">🔀 Priority Jump</button>
+    <button class="btn btn-disrupt" onclick="disruptParts()">⛔ Parts Rejected</button>
+    <button class="btn btn-danger" onclick="disruptEngineer()">🔧 Engineer Reassigned</button>
+  </div>
+  <div class="ctrl-group" style="margin-left:auto;">
+    <span class="ctrl-label">Speed:</span>
+    <div class="speed-row">
+      <button class="speed-btn active" id="sp1" onclick="setSpeed(1,this)">1×</button>
+      <button class="speed-btn" id="sp2" onclick="setSpeed(2,this)">2×</button>
+      <button class="speed-btn" id="sp5" onclick="setSpeed(5,this)">5×</button>
+    </div>
+    <button class="btn btn-secondary" onclick="resetSim()">↺ Reset</button>
+  </div>
+</div>
+
+<div class="log-panel" id="log"></div>
+
+<footer>TAQA LEAD Programme · Module 2 · Built by <a href="#">VectorEd</a></footer>
+
+<script>
+const STAGES = [
+  { id:1, name:'Fault Reported', short:'1· Fault', min:2, max:4 },
+  { id:2, name:'WO Raised', short:'2· WO Raised', min:3, max:6 },
+  { id:3, name:'Parts Requested', short:'3· Parts', min:4, max:8 },
+  { id:4, name:'Engineer Dispatched', short:'4· Engineer', min:5, max:10 },
+  { id:5, name:'Job Closed', short:'5· Closed', min:2, max:3 },
+];
+
+const FAULT_TYPES = [
+  'Protection relay fault','Transformer thermal deviation','Cable insulation degradation',
+  'Switchgear malfunction','Water pump pressure drop','Pipeline valve failure',
+  'SCADA telemetry loss','Overhead line sag detected','Substation earthing fault',
+  'Cooling system failure','Backup power unit fault','Metering accuracy issue',
+];
+
+let jobs = [];
+let completed = [];
+let nextId = 1;
+let ticker = null;
+let simTime = 0;
+let speed = 1;
+let engineerDown = false;
+let completedInWindow = [];
+
+function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function randFault(){ return FAULT_TYPES[Math.floor(Math.random()*FAULT_TYPES.length)]; }
+function pad(n){ return String(n).padStart(2,'0'); }
+function fmtTime(s){ return `${pad(Math.floor(s/60))}:${pad(s%60)}`; }
+
+function addJob(priority=false) {
+  const job = {
+    id: `WO-${String(nextId).padStart(3,'0')}`,
+    desc: randFault(),
+    stage: 1,
+    stageTime: 0,
+    stageMax: rand(STAGES[0].min, STAGES[0].max) * (priority ? 0.5 : 1),
+    priority,
+    held: false,
+    created: simTime,
+  };
+  nextId++;
+  if (priority) {
+    jobs.unshift(job);
+    log(`Priority fault added: ${job.id} — ${job.desc}`, 'event');
+  } else {
+    jobs.push(job);
+    log(`New fault logged: ${job.id} — ${job.desc}`, 'event');
+  }
+  render();
+}
+
+function disruptPriority() {
+  const nonPri = jobs.filter(j=>!j.priority&&j.stage<5);
+  if (!nonPri.length) return log('No non-priority jobs to jump','disrupt');
+  const j = nonPri[Math.floor(Math.random()*nonPri.length)];
+  j.priority = true;
+  j.stageMax = Math.max(1, Math.floor(j.stageMax * 0.4));
+  log(`DISRUPTION: ${j.id} upgraded to priority — jumped to front of queue`,'disrupt');
+  render();
+}
+
+function disruptParts() {
+  const stage3 = jobs.filter(j=>j.stage===3&&!j.held);
+  if (!stage3.length) { log('No jobs currently in Parts Requested stage','disrupt'); return; }
+  const j = stage3[0];
+  j.held = true;
+  j.holdTime = rand(8,15);
+  log(`DISRUPTION: Parts rejected for ${j.id} — job held in Parts Requested`,'disrupt');
+  render();
+}
+
+function disruptEngineer() {
+  engineerDown = true;
+  setTimeout(()=>{ engineerDown=false; log('Engineer returned to normal operations','event'); }, 20000/speed);
+  log(`DISRUPTION: Engineer reassigned — stage 4 temporarily blocked`,'disrupt');
+  render();
+}
+
+function tick() {
+  simTime++;
+  const now = Date.now()/1000;
+  completedInWindow = completedInWindow.filter(t => now-t < 60);
+
+  jobs.forEach(job => {
+    if (job.held) {
+      job.holdTime--;
+      if (job.holdTime <= 0) { job.held = false; log(`Parts cleared for ${job.id} — resuming`,'event'); }
+      return;
+    }
+    if (job.stage === 4 && engineerDown) return;
+    job.stageTime++;
+    if (job.stageTime >= job.stageMax) {
+      job.stage++;
+      job.stageTime = 0;
+      if (job.stage <= 5) {
+        const s = STAGES[job.stage-1];
+        job.stageMax = rand(s.min, s.max);
+      }
+      if (job.stage === 6) {
+        completed.push({ ...job, completedAt: simTime });
+        completedInWindow.push(now);
+        log(`✓ ${job.id} completed — ${fmtTime(simTime-job.created)} total lead time`,'complete');
+      }
+    }
+  });
+
+  jobs = jobs.filter(j=>j.stage<6);
+  render();
+}
+
+function updateStats() {
+  const wip = jobs.filter(j=>j.stage>=1&&j.stage<=4).length;
+  const throughput = completedInWindow.length;
+  const lt = throughput > 0 ? (wip / (throughput/60)).toFixed(1) + 's' : (wip > 0 ? 'Building…' : '—');
+  document.getElementById('stat-wip').textContent = wip;
+  document.getElementById('stat-throughput').textContent = (throughput/1).toFixed(1);
+  document.getElementById('stat-leadtime').textContent = typeof lt==='string'&&lt.includes('s') ? lt : lt;
+  document.getElementById('stat-done').textContent = completed.length;
+}
+
+function render() {
+  const board = document.getElementById('board');
+  board.innerHTML = STAGES.map((s,si) => {
+    const stageJobs = jobs.filter(j=>j.stage===s.id);
+    const cards = stageJobs.map(j=>{
+      const pct = Math.min(100,Math.round((j.stageTime/j.stageMax)*100));
+      const cls = j.held?'held':j.priority?'priority':'normal';
+      return `<div class="job-card ${cls}">
+        <div class="job-id">${j.id}</div>
+        <div class="job-desc">${j.desc}</div>
+        <div class="job-time">${pct}% processed · in ${fmtTime(simTime-j.created)}</div>
+        ${j.priority?'<span class="job-tag priority">PRIORITY</span>':''}
+        ${j.held?'<span class="job-tag held">PARTS HOLD</span>':''}
+        ${s.id===4&&engineerDown&&!j.held?'<span class="job-tag held">ENG. DOWN</span>':''}
+      </div>`;
+    }).join('');
+    return `<div class="lane lane-${s.id}">
+      <div class="lane-hdr">${s.name}<span class="lane-count">${stageJobs.length}</span></div>
+      <div class="lane-body">${cards}</div>
+    </div>`;
+  }).join('');
+  updateStats();
+}
+
+function log(msg, type='event') {
+  const panel = document.getElementById('log');
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${type}`;
+  entry.innerHTML = `<span class="log-time">${fmtTime(simTime)}</span><span>${msg}</span>`;
+  panel.insertBefore(entry, panel.firstChild);
+  if (panel.children.length > 50) panel.removeChild(panel.lastChild);
+}
+
+function setSpeed(s, btn) {
+  speed = s;
+  document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  clearInterval(ticker);
+  ticker = setInterval(tick, 1000/speed);
+}
+
+function resetSim() {
+  jobs=[]; completed=[]; nextId=1; simTime=0; engineerDown=false; completedInWindow=[];
+  document.getElementById('log').innerHTML='';
+  render();
+  log('Simulation reset — ready to start','event');
+}
+
+// Init
+render();
+log('Simulation ready. Click "Add Fault" to begin.','event');
+ticker = setInterval(tick, 1000);
+
+// Auto-add some initial jobs after a moment
+setTimeout(()=>{ addJob(); addJob(); addJob(); }, 500);
+</script>
+</body>
+</html>

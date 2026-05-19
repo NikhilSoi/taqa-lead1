@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asset Health Simulator · TAQA LEAD</title>
+<style>
+:root{--teal:#0F6E56;--teal-lt:#D6F0E8;--teal-xl:#EEF8F4;--orange:#E87722;--orange-lt:#FEF3EA;--red:#C0392B;--red-lt:#FDEDEC;--green:#1A7A5E;--green-lt:#EAFAF1;--dark:#1A1A2E;--mid:#3D3D3D;--light:#777;--grey:#F4F5F7;--border:#E2E5E8;--white:#fff;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--grey);color:var(--mid);}
+header{background:var(--dark);padding:14px 20px;display:flex;align-items:center;gap:12px;}
+.badge{background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.06em;}
+header h1{color:#fff;font-size:17px;font-weight:600;flex:1;}
+.header-tag{color:#aaa;font-size:12px;}
+
+
+
+
+
+.container{max-width:880px;margin:0 auto;padding:28px 20px;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+@media(max-width:640px){.grid{grid-template-columns:1fr;}}
+
+/* Asset info card */
+.card{background:#fff;border-radius:12px;border:1.5px solid var(--border);padding:24px;}
+.card-title{font-size:13px;font-weight:700;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--light);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
+.field input, .field select{width:100%;padding:9px 12px;border-radius:7px;border:1.5px solid var(--border);font-size:14px;color:var(--dark);background:#fff;}
+.field input:focus, .field select:focus{outline:none;border-color:var(--teal);}
+
+/* Sliders */
+.factor{margin-bottom:20px;}
+.factor-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.factor-name{font-size:14px;font-weight:600;color:var(--dark);}
+.factor-score{font-size:20px;font-weight:700;color:var(--teal);min-width:28px;text-align:right;}
+.factor-desc{font-size:12px;color:var(--light);margin-bottom:8px;line-height:1.4;}
+input[type=range]{width:100%;-webkit-appearance:none;height:6px;border-radius:3px;background:var(--border);outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--teal);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.range-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--light);margin-top:4px;}
+
+/* Score display */
+.score-card{background:#fff;border-radius:12px;border:1.5px solid var(--border);padding:24px;grid-column:1/-1;}
+.score-display{display:flex;align-items:center;gap:24px;margin-bottom:20px;}
+.score-circle{width:90px;height:90px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;border:4px solid;}
+.score-num{font-size:32px;font-weight:700;line-height:1;}
+.score-max{font-size:12px;opacity:.7;}
+.score-info{flex:1;}
+.score-label{font-size:22px;font-weight:700;margin-bottom:6px;}
+.score-sub{font-size:14px;color:var(--light);line-height:1.5;}
+.action-badge{display:inline-block;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;margin-top:8px;}
+
+/* Score meter */
+.meter{height:12px;border-radius:6px;background:var(--border);overflow:hidden;margin-bottom:20px;}
+.meter-fill{height:100%;border-radius:6px;transition:width .4s ease,background .4s ease;}
+
+/* Factor breakdown */
+.breakdown{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px;}
+.breakdown-item{text-align:center;padding:10px 6px;border-radius:8px;border:1.5px solid var(--border);background:var(--grey);}
+.breakdown-num{font-size:18px;font-weight:700;}
+.breakdown-name{font-size:10px;color:var(--light);margin-top:4px;line-height:1.3;}
+
+/* AI recommendation */
+.ai-section{border-top:2px solid var(--border);padding-top:20px;margin-top:4px;}
+.ai-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.ai-header h3{font-size:14px;font-weight:700;color:var(--dark);}
+.ai-badge{background:var(--teal-xl);color:var(--teal);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.analyse-btn{padding:10px 24px;background:var(--teal);border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;}
+.analyse-btn:hover{background:#0d5e49;}
+.analyse-btn:disabled{opacity:.4;cursor:not-allowed;}
+.ai-response{background:var(--teal-xl);border:1.5px solid var(--teal-lt);border-radius:8px;padding:16px 20px;font-size:14px;color:var(--dark);line-height:1.7;margin-top:12px;}
+.ai-response.loading{display:flex;align-items:center;gap:10px;color:var(--teal);}
+.spinner{width:18px;height:18px;border:2px solid var(--teal-lt);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+footer{text-align:center;padding:20px;font-size:11px;color:var(--light);}
+footer a{color:var(--teal);text-decoration:none;}
+</style>
+</head>
+<body>
+<header>
+  <span class="badge">T5</span>
+  <h1>Asset Health Simulator</h1>
+  <span class="header-tag">TAQA LEAD · Module 2</span>
+</header>
+
+<div class="container">
+
+  <div class="grid">
+    <!-- Asset Info -->
+    <div class="card">
+      <div class="card-title">📋 Asset Details</div>
+      <div class="field">
+        <label>Asset Name / ID</label>
+        <input type="text" id="asset-name" placeholder="e.g. Transformer T-047 / Substation 12" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Asset Type</label>
+        <select id="asset-type" onchange="update()">
+          <option value="">Select type…</option>
+          <option>Power Transformer</option>
+          <option>Overhead Line Section</option>
+          <option>Substation Switchgear</option>
+          <option>Underground Cable</option>
+          <option>Pumping Station Motor</option>
+          <option>Water Pipeline Section</option>
+          <option>Protection Relay System</option>
+          <option>HV Circuit Breaker</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Your Name / Team</label>
+        <input type="text" id="assessor" placeholder="e.g. Ahmed Al-Mansoori · Substation Team B" oninput="update()">
+      </div>
+    </div>
+
+    <!-- Factors -->
+    <div class="card">
+      <div class="card-title">⚙️ Health Factors — Score each 1 to 5</div>
+      <div id="factors-container"></div>
+    </div>
+  </div>
+
+  <!-- Score card (full width) -->
+  <div style="margin-top:20px;">
+    <div class="score-card">
+      <div class="score-display">
+        <div class="score-circle" id="score-circle">
+          <span class="score-num" id="score-num">0</span>
+          <span class="score-max">/25</span>
+        </div>
+        <div class="score-info">
+          <div class="score-label" id="score-label">Score your asset to begin</div>
+          <div class="score-sub" id="score-sub">Adjust the five factors on the left to generate your assessment.</div>
+          <div id="action-badge"></div>
+        </div>
+      </div>
+      <div class="meter"><div class="meter-fill" id="meter-fill" style="width:0%;background:var(--teal)"></div></div>
+      <div class="breakdown" id="breakdown"></div>
+
+      <div class="ai-section">
+        <div class="ai-header">
+          <h3>AI Recommendation</h3>
+          <span class="ai-badge">Powered by Claude</span>
+        </div>
+        <button class="analyse-btn" id="analyse-btn" onclick="getRecommendation()">
+          <span>🤖</span> Generate Recommendation
+        </button>
+        <div id="ai-response"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<footer>TAQA LEAD Programme · Module 2 · Built by <a href="#">VectorEd</a></footer>
+
+<script>
+const API_ENDPOINT = '/api/chat';
+
+
+const FACTORS = [
+  {
+    id:'age', name:'Age Relative to Design Life',
+    desc:'How far through the expected operating life is this asset?',
+    labels:['Well within life','','Mid-life range','','Near/past design life'],
+  },
+  {
+    id:'faults', name:'Fault History — Last 12 Months',
+    desc:'How many unplanned faults or incidents has this asset had?',
+    labels:['Zero faults','','2–3 faults','','4+ or one critical failure'],
+  },
+  {
+    id:'cost', name:'Maintenance Cost Trend — 3 Years',
+    desc:'Is the cost to maintain this asset increasing?',
+    labels:['Flat/declining','','Moderate increase','','Significant/accelerating'],
+  },
+  {
+    id:'monitoring', name:'Condition Monitoring Coverage',
+    desc:'How well is this asset\'s health being monitored?',
+    labels:['Full monitoring','','Partial coverage','','No monitoring'],
+  },
+  {
+    id:'criticality', name:'Criticality to Network Reliability',
+    desc:'What is the impact if this asset fails?',
+    labels:['Low — redundancy','','Medium — delayed','','High — single point of failure'],
+  },
+];
+
+const scores = { age:1, faults:1, cost:1, monitoring:1, criticality:1 };
+
+function renderFactors() {
+  const c = document.getElementById('factors-container');
+  c.innerHTML = FACTORS.map(f => `
+    <div class="factor">
+      <div class="factor-header">
+        <span class="factor-name">${f.name}</span>
+        <span class="factor-score" id="score-${f.id}">1</span>
+      </div>
+      <div class="factor-desc">${f.desc}</div>
+      <input type="range" min="1" max="5" value="1" id="range-${f.id}" oninput="scoreChange('${f.id}',this.value)">
+      <div class="range-labels">
+        ${f.labels.map(l=>`<span>${l}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function scoreChange(id, val) {
+  scores[id] = parseInt(val);
+  document.getElementById(`score-${id}`).textContent = val;
+  update();
+}
+
+function getCategory(total) {
+  if (total <= 10) return { label:'Monitor Routinely', sub:'Asset is in acceptable condition. Continue scheduled maintenance and monitoring.', color:'var(--green)', fill:'var(--green-lt)', badge:'#1A7A5E', badgeBg:'var(--green-lt)' };
+  if (total <= 18) return { label:'Escalate for Review', sub:'Elevated risk indicators. Flag to your engineering team for condition assessment within 30 days.', color:'var(--orange)', fill:'var(--orange-lt)', badge:'var(--orange)', badgeBg:'var(--orange-lt)' };
+  return { label:'Flag for Lifecycle Decision', sub:'Multiple high-risk factors. Escalate to asset management team immediately — this asset needs a replace or rehabilitate decision.', color:'var(--red)', fill:'var(--red-lt)', badge:'var(--red)', badgeBg:'var(--red-lt)' };
+}
+
+function update() {
+  const total = Object.values(scores).reduce((a,b)=>a+b,0);
+  const cat = getCategory(total);
+  const pct = (total/25)*100;
+
+  document.getElementById('score-num').textContent = total;
+  document.getElementById('score-label').textContent = cat.label;
+  document.getElementById('score-sub').textContent = cat.sub;
+
+  const circle = document.getElementById('score-circle');
+  circle.style.borderColor = cat.color;
+  circle.querySelector('.score-num').style.color = cat.color;
+
+  document.getElementById('meter-fill').style.width = pct + '%';
+  document.getElementById('meter-fill').style.background = cat.color;
+
+  const badge = document.getElementById('action-badge');
+  badge.innerHTML = `<span class="action-badge" style="background:${cat.badgeBg};color:${cat.badge};border:1.5px solid ${cat.badge}">${cat.label}</span>`;
+
+  const bd = document.getElementById('breakdown');
+  bd.innerHTML = FACTORS.map(f => {
+    const s = scores[f.id];
+    const c = s<=2?'var(--green)':s===3?'var(--orange)':'var(--red)';
+    return `<div class="breakdown-item"><div class="breakdown-num" style="color:${c}">${s}</div><div class="breakdown-name">${f.name.split(' ').slice(0,2).join(' ')}</div></div>`;
+  }).join('');
+
+  document.getElementById('ai-response').innerHTML = '';
+}
+
+async function getRecommendation() {
+  if (!apiKey) { alert('Please enter your Anthropic API key at the top.'); return; }
+  const name = document.getElementById('asset-name').value || 'Unspecified asset';
+  const type = document.getElementById('asset-type').value || 'transmission asset';
+  const total = Object.values(scores).reduce((a,b)=>a+b,0);
+  const cat = getCategory(total);
+
+  const btn = document.getElementById('analyse-btn');
+  btn.disabled = true;
+  document.getElementById('ai-response').innerHTML = '<div class="ai-response loading"><div class="spinner"></div>Generating recommendation…</div>';
+
+  const prompt = `Asset assessment for a TAQA Transmission manager:
+
+Asset: ${name} (${type})
+Overall score: ${total}/25 — ${cat.label}
+
+Factor scores (1=low concern, 5=high concern):
+- Age relative to design life: ${scores.age}/5
+- Fault history last 12 months: ${scores.faults}/5
+- Maintenance cost trend 3 years: ${scores.cost}/5
+- Condition monitoring coverage: ${scores.monitoring}/5
+- Criticality to network reliability: ${scores.criticality}/5
+
+Provide a practical recommendation in 4–5 sentences for a first-time manager at TAQA Transmission. Include: what the highest-scoring factors suggest about the asset's health, what the most important risk is, and one specific action the manager should take this week. Be direct and operational — no jargon.`;
+
+  try {
+    const res = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:400, messages:[{role:'user',content:prompt}] })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    document.getElementById('ai-response').innerHTML = `<div class="ai-response">${data.content[0].text.replace(/\n/g,'<br>')}</div>`;
+  } catch(e) {
+    document.getElementById('ai-response').innerHTML = `<div class="ai-response" style="background:var(--red-lt);border-color:var(--red);color:var(--red)">Error: ${e.message}</div>`;
+  }
+  btn.disabled = false;
+}
+
+renderFactors();
+update();
+</script>
+</body>
+</html>

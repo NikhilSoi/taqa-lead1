@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operational Excellence Tools · TAQA LEAD Module 2</title>
+<style>
+:root{--teal:#0F6E56;--teal-lt:#D6F0E8;--teal-xl:#EEF8F4;--orange:#E87722;--orange-lt:#FEF3EA;--dark:#1A1A2E;--mid:#3D3D3D;--light:#777;--grey:#F4F5F7;--border:#E2E5E8;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:var(--dark);color:#fff;min-height:100vh;}
+header{padding:32px 24px 0;text-align:center;}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:12px;}
+header h1{font-size:36px;font-weight:700;line-height:1.2;margin-bottom:10px;}
+header h1 span{color:var(--orange);}
+header p{font-size:15px;color:#aaa;max-width:500px;margin:0 auto;line-height:1.6;}
+.rule{width:60px;height:3px;background:var(--teal);margin:24px auto;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;padding:32px 24px;max-width:1100px;margin:0 auto;}
+
+.tool-card{background:#fff;border-radius:14px;overflow:hidden;text-decoration:none;transition:transform .18s,box-shadow .18s;display:flex;flex-direction:column;}
+.tool-card:hover{transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.25);}
+.card-top{padding:24px 24px 16px;flex:1;}
+.card-num{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
+.card-title{font-size:20px;font-weight:700;color:var(--dark);margin-bottom:8px;line-height:1.3;}
+.card-desc{font-size:13px;color:var(--light);line-height:1.6;}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+.tag{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;}
+.card-footer{padding:12px 24px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:var(--teal);}
+.card-footer span{color:var(--light);font-weight:400;}
+.arrow{font-size:16px;}
+
+/* Card accent colours */
+.c1 .card-num{color:#1A5276;}
+.c1 .card-footer{color:#1A5276;}
+.c1 .card-top{border-top:4px solid #1A5276;}
+
+.c2 .card-num{color:var(--teal);}
+.c2 .card-footer{color:var(--teal);}
+.c2 .card-top{border-top:4px solid var(--teal);}
+
+.c3 .card-num{color:#6C3483;}
+.c3 .card-footer{color:#6C3483;}
+.c3 .card-top{border-top:4px solid #6C3483;}
+
+.c4 .card-num{color:var(--orange);}
+.c4 .card-footer{color:var(--orange);}
+.c4 .card-top{border-top:4px solid var(--orange);}
+
+.c5 .card-num{color:#1A7A5E;}
+.c5 .card-footer{color:#1A7A5E;}
+.c5 .card-top{border-top:4px solid #1A7A5E;}
+
+
+
+
+footer{text-align:center;padding:20px 24px;font-size:12px;color:#555;}
+footer a{color:var(--teal);text-decoration:none;}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">TAQA Transmission · LEAD Programme · Module 2</div>
+  <h1>Operational Excellence<br><span>Digital Toolkit</span></h1>
+  <p>Five interactive tools for diagnosing problems, managing assets, applying continuous improvement, and using AI as a co-pilot.</p>
+  <div class="rule"></div>
+</header>
+
+<div class="grid">
+  <a href="ci-selector.html" class="tool-card c1">
+    <div class="card-top">
+      <div class="card-num">Tool 1 · T6 · Session D2·05</div>
+      <div class="card-title">CI Method Selector</div>
+      <div class="card-desc">Answer four questions about your problem and get routed to the right improvement method — PDCA, DMAIC, or Kaizen — with key steps and a TAQA example.</div>
+      <div class="card-tags">
+        
+        <span class="tag" style="background:var(--grey);color:var(--light);">Decision tree</span>
+        <span class="tag" style="background:var(--grey);color:var(--light);">Continuous improvement</span>
+      </div>
+    </div>
+    <div class="card-footer">Open tool <span></span> <span class="arrow">→</span></div>
+  </a>
+
+  <a href="work-order-sim.html" class="tool-card c2">
+    <div class="card-top">
+      <div class="card-num">Tool 2 · D1·05 · Session Simulation</div>
+      <div class="card-title">Work Order Backlog Simulation</div>
+      <div class="card-desc">Live simulation of a 5-stage maintenance work order pipeline. Watch Little's Law in action — add faults, trigger disruptions, and see how WIP affects lead time in real time.</div>
+      <div class="card-tags">
+        
+        <span class="tag" style="background:var(--grey);color:var(--light);">Live simulation</span>
+        <span class="tag" style="background:var(--grey);color:var(--light);">Little's Law</span>
+      </div>
+    </div>
+    <div class="card-footer">Open tool <span></span> <span class="arrow">→</span></div>
+  </a>
+
+  <a href="five-whys.html" class="tool-card c3">
+    <div class="card-top">
+      <div class="card-num">Tool 3 · T7 · Session D2·06</div>
+      <div class="card-title">5 Whys AI Coach</div>
+      <div class="card-desc">Describe your operational problem and Claude guides you through the 5 Whys — asking each Why in sequence, challenging vague answers, and identifying the root cause.</div>
+      <div class="card-tags">
+        
+        <span class="tag" style="background:var(--grey);color:var(--light);">Root cause analysis</span>
+        <span class="tag" style="background:var(--grey);color:var(--light);">AI-powered</span>
+      </div>
+    </div>
+    <div class="card-footer">Open tool <span></span> <span class="arrow">→</span></div>
+  </a>
+
+  <a href="asset-health.html" class="tool-card c4">
+    <div class="card-top">
+      <div class="card-num">Tool 4 · T5 · Session D2·04</div>
+      <div class="card-title">Asset Health Simulator</div>
+      <div class="card-desc">Score five health factors for any TAQA asset — age, fault history, cost trend, condition monitoring, criticality — and get a live Monitor / Escalate / Flag result with an AI-generated recommendation.</div>
+      <div class="card-tags">
+        
+        <span class="tag" style="background:var(--grey);color:var(--light);">Asset management</span>
+        <span class="tag" style="background:var(--grey);color:var(--light);">AI recommendation</span>
+      </div>
+    </div>
+    <div class="card-footer">Open tool <span></span> <span class="arrow">→</span></div>
+  </a>
+
+  <a href="prompt-lab.html" class="tool-card c5">
+    <div class="card-top">
+      <div class="card-num">Tool 5 · T4 · Session D1·09</div>
+      <div class="card-title">AI Prompt Lab</div>
+      <div class="card-desc">15 pre-built prompts across three categories — Analyse, Draft, Think. Fill in your context, run with Claude, and copy the response. Includes fault analysis, handover notes, decision stress-tests, and more.</div>
+      <div class="card-tags">
+        
+        <span class="tag" style="background:var(--grey);color:var(--light);">15 prompts</span>
+        <span class="tag" style="background:var(--grey);color:var(--light);">AI co-pilot</span>
+      </div>
+    </div>
+    <div class="card-footer">Open tool <span></span> <span class="arrow">→</span></div>
+  </a>
+</div>
+
+<footer>
+  TAQA Transmission · LEAD Programme · Module 2 · Operational Excellence Dynamics · Cohort 3 · June 2026<br>
+  Built by <a href="https://nikhilsoi.github.io">VectorEd Academic Intelligence Platform</a> · Faculty: Nikhil Soi · FHEA · CMBE · MA-AI
+</footer>
+</body>
+</html>

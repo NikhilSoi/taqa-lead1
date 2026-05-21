@@ -5,46 +5,109 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Prompt Lab · TAQA LEAD</title>
 <style>
-:root{--teal:#0F6E56;--teal-lt:#D6F0E8;--teal-xl:#EEF8F4;--orange:#E87722;--orange-lt:#FEF3EA;--blue:#1A5276;--blue-lt:#EAF1F8;--purple:#6C3483;--purple-lt:#F4EEF9;--dark:#1A1A2E;--mid:#3D3D3D;--light:#777;--grey:#F4F5F7;--border:#E2E5E8;}
+:root{
+  --teal:#0F6E56;--teal-lt:#D6F0E8;--teal-xl:#EEF8F4;
+  --orange:#E87722;--orange-lt:#FEF3EA;
+  --blue:#1A5276;--blue-lt:#EAF1F8;
+  --purple:#6C3483;--purple-lt:#F4EEF9;
+  --navy:#00093F;
+  --dark:#1A1A2E;--mid:#3D3D3D;--light:#777;
+  --grey:#F4F5F7;--border:#E2E5E8;--white:#fff;
+  --red:#C0392B;--red-lt:#FDEDEC;
+}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Segoe UI',Arial,sans-serif;background:var(--grey);color:var(--mid);min-height:100vh;}
+
 header{background:var(--dark);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
 .badge{background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.06em;}
 header h1{color:#fff;font-size:17px;font-weight:600;flex:1;}
 .header-tag{color:#aaa;font-size:12px;}
+
+/* Formula bar */
 .formula-bar{background:var(--teal-xl);border-bottom:2px solid var(--teal-lt);padding:10px 20px;font-size:13px;color:var(--teal);}
 .formula-bar strong{margin-right:8px;}
-.layout{display:flex;height:calc(100vh - 100px);overflow:hidden;}
+
+/* Layout */
+.layout{display:flex;height:calc(100vh - 112px);overflow:hidden;}
+
+/* Sidebar */
 .sidebar{width:280px;background:#fff;border-right:2px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
 .cat-section{border-bottom:1px solid var(--border);}
-.cat-header{padding:10px 16px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.cat-header{padding:10px 16px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
 .cat-analyse .cat-header{color:var(--teal);background:var(--teal-xl);}
-.cat-draft .cat-header{color:var(--blue);background:var(--blue-lt);}
-.cat-think .cat-header{color:var(--purple);background:var(--purple-lt);}
-.prompt-item{padding:10px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s;}
+.cat-draft   .cat-header{color:var(--blue);background:var(--blue-lt);}
+.cat-think   .cat-header{color:var(--purple);background:var(--purple-lt);}
+.prompt-item{padding:9px 16px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s;position:relative;}
 .prompt-item:hover{background:var(--grey);}
 .prompt-item.active{background:var(--teal-xl);border-left:3px solid var(--teal);}
 .prompt-num{font-size:10px;color:var(--light);margin-bottom:2px;}
 .prompt-name{font-size:13px;font-weight:600;color:var(--dark);}
+.scenario-tag{font-size:10px;background:#FF5F00;color:#fff;padding:1px 6px;border-radius:10px;margin-left:6px;vertical-align:middle;}
+
+/* Main */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .prompt-area{flex:1;overflow-y:auto;padding:20px;}
+
+/* Empty state */
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--light);gap:12px;}
 .empty-state h3{font-size:16px;color:var(--mid);}
 .empty-state p{font-size:13px;text-align:center;max-width:300px;line-height:1.5;}
+
+/* ── SCENARIO PANEL ─────────────────────────────────────────────────────── */
+.scenario-panel{
+  background:linear-gradient(135deg,#001830,#0D1F5A);
+  border:2px solid #FF5F00;border-radius:10px;
+  padding:0;margin-bottom:16px;overflow:hidden;
+}
+.scenario-panel-header{
+  background:#FF5F00;padding:10px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.scenario-panel-header h4{color:#fff;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;}
+.scenario-toggle-btns{display:flex;gap:6px;}
+.scen-btn{
+  padding:4px 12px;border:none;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer;transition:.15s;
+}
+.scen-btn-use{background:#fff;color:#FF5F00;}
+.scen-btn-use:hover{background:#FFF3EC;}
+.scen-btn-own{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.4);}
+.scen-btn-own:hover{background:rgba(255,255,255,.3);}
+.scenario-body{padding:14px 16px;}
+.scenario-context-label{font-size:10px;font-weight:700;color:#FF5F00;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;}
+.scenario-context-text{font-size:13px;color:#DDDDDD;line-height:1.65;margin-bottom:10px;}
+.scenario-data-label{font-size:10px;font-weight:700;color:#89D4C8;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
+.scenario-data-pre{
+  background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);border-radius:6px;
+  padding:10px 12px;font-size:12px;color:#B8E8E0;font-family:'Consolas','Courier New',monospace;
+  line-height:1.6;white-space:pre-wrap;word-break:break-word;
+  max-height:160px;overflow-y:auto;
+}
+.scenario-insight{
+  margin-top:10px;background:rgba(255,95,0,.15);border-left:3px solid #FF5F00;
+  padding:8px 12px;border-radius:0 6px 6px 0;
+}
+.scenario-insight-label{font-size:10px;color:#FF5F00;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px;}
+.scenario-insight-text{font-size:12px;color:#DDDDDD;line-height:1.5;}
+
+/* Prompt editor */
 .prompt-editor{background:#fff;border-radius:12px;border:1.5px solid var(--border);overflow:hidden;}
-.pe-header{padding:16px 20px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:12px;}
+.pe-header{padding:14px 20px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:12px;}
 .pe-cat-badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
 .pe-title{font-size:17px;font-weight:700;color:var(--dark);}
 .pe-body{padding:20px;}
 .pe-label{font-size:11px;font-weight:700;color:var(--light);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
-.pe-prompt{background:var(--grey);border-radius:8px;padding:14px 16px;font-size:13px;color:var(--mid);line-height:1.7;margin-bottom:16px;border:1.5px solid var(--border);font-family:inherit;}
+.pe-prompt{background:var(--grey);border-radius:8px;padding:12px 14px;font-size:12.5px;color:var(--mid);line-height:1.7;margin-bottom:16px;border:1.5px solid var(--border);font-family:'Consolas','Courier New',monospace;white-space:pre-wrap;}
 .context-field{margin-bottom:12px;}
 .context-field label{display:block;font-size:12px;font-weight:600;color:var(--mid);margin-bottom:5px;}
-.context-field textarea{width:100%;padding:9px 12px;border-radius:7px;border:1.5px solid var(--border);font-size:13px;color:var(--dark);resize:vertical;min-height:60px;font-family:inherit;}
+.context-field textarea{width:100%;padding:9px 12px;border-radius:7px;border:1.5px solid var(--border);font-size:13px;color:var(--dark);resize:vertical;min-height:60px;font-family:inherit;transition:border-color .2s;}
 .context-field textarea:focus{outline:none;border-color:var(--teal);}
+.context-field textarea.prefilled{border-color:var(--orange);background:#FFFAF5;}
+
 .run-btn{padding:10px 24px;background:var(--teal);border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:16px;}
 .run-btn:hover{background:#0d5e49;}
 .run-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* Response */
 .response-area{background:var(--teal-xl);border:1.5px solid var(--teal-lt);border-radius:8px;padding:16px 20px;margin-top:4px;}
 .response-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .response-header h4{font-size:12px;font-weight:700;color:var(--teal);letter-spacing:.06em;text-transform:uppercase;}
@@ -54,106 +117,443 @@ header h1{color:#fff;font-size:17px;font-weight:600;flex:1;}
 .loading-row{display:flex;align-items:center;gap:10px;color:var(--teal);}
 .spinner{width:16px;height:16px;border:2px solid var(--teal-lt);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
-footer{text-align:center;padding:10px;font-size:11px;color:var(--light);background:#fff;border-top:1px solid var(--border);}
-footer a{color:var(--teal);text-decoration:none;}
+
+/* Debrief prompt */
+.debrief-box{background:#FFF8F3;border:1.5px solid var(--orange);border-radius:8px;padding:12px 16px;margin-top:12px;}
+.debrief-box p{font-size:13px;color:var(--dark);line-height:1.6;}
+.debrief-box strong{color:var(--orange);}
+
+footer{text-align:center;padding:8px;font-size:11px;color:var(--light);background:#fff;border-top:1px solid var(--border);}
+
+@media(max-width:600px){.sidebar{width:220px;}.layout{height:auto;flex-direction:column;}.main{min-height:60vh;}}
+
+/* ── BRIEFING OVERLAY ──────────────────────────────────────────────── */
+#briefing-overlay{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#00093F 0%,#0D1F5A 60%,#001830 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;}
+#briefing-overlay.hidden{display:none;}
+.br-badge{background:#FF5F00;color:#fff;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:16px;}
+.br-session{color:#AAAAAA;font-size:13px;margin-bottom:6px;letter-spacing:.06em;}
+.br-title{color:#fff;font-size:26px;font-weight:700;line-height:1.25;margin-bottom:14px;max-width:620px;}
+.br-box{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:14px 22px;max-width:560px;margin-bottom:18px;}
+.br-box-label{color:#FF5F00;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
+.br-box-text{color:#DDDDDD;font-size:14px;line-height:1.6;}
+.br-box-text strong{color:#fff;}
+.br-steps{max-width:520px;margin-bottom:24px;text-align:left;}
+.br-step{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;}
+.br-num{background:#FF5F00;color:#fff;font-size:11px;font-weight:700;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.br-text{color:#CCCCCC;font-size:13.5px;line-height:1.5;}
+.br-text strong{color:#fff;}
+.br-btn{background:#FF5F00;color:#fff;border:none;font-size:15px;font-weight:700;padding:13px 38px;border-radius:8px;cursor:pointer;letter-spacing:.04em;transition:background .2s;}
+.br-btn:hover{background:#D94E00;}
+.br-footer{color:#555;font-size:11px;margin-top:12px;}
 </style>
 </head>
 <body>
+
+<div id="briefing-overlay">
+  <div class="br-badge">AI LAB</div>
+  <div class="br-session">SESSION D1·09  ·  AI as Operational Co-Pilot</div>
+  <div class="br-title">AI Prompt Lab</div>
+  <div class="br-box">
+    <div class="br-box-label">THE CONCEPT: ROLE + CONTEXT + TASK + FORMAT</div>
+    <div class="br-box-text">A vague prompt produces a vague answer. A good prompt has four parts: <strong>Role</strong> (who Claude should be), <strong>Context</strong> (your specific situation), <strong>Task</strong> (what you need), <strong>Format</strong> (how the answer should look). Each part makes the output sharply better.</div>
+  </div>
+  <div class="br-steps">
+    <div class="br-step"><div class="br-num">A</div><div class="br-text"><strong>Analyse —</strong> Choose "Fault Pattern Analysis". A real TAQA work order log is pre-loaded. Click Use This Scenario, then Run.</div></div>
+    <div class="br-step"><div class="br-num">B</div><div class="br-text"><strong>Think —</strong> Choose "Decision Stress-Test". A real management dilemma is pre-loaded. Use it or describe your own.</div></div>
+    <div class="br-step"><div class="br-num">C</div><div class="br-text"><strong>Draft —</strong> Choose "Team Briefing". A real change scenario is pre-loaded. Use it or describe your own situation.</div></div>
+    <div class="br-step"><div class="br-num">4</div><div class="br-text">For each: read the output, <strong>refine your prompt</strong>, run again. Notice what changes.</div></div>
+  </div>
+  <button class="br-btn" onclick="dismissBriefing()">Open the Lab &rarr;</button>
+  <div class="br-footer">taqa-lead1.vercel.app  ·  TAQA LEAD Module 2</div>
+</div>
+
 <header>
-  <span class="badge">T4</span>
+  <span class="badge">AI LAB</span>
   <h1>AI Prompt Lab</h1>
-  <span class="header-tag">TAQA LEAD · Module 2</span>
+  <span class="header-tag">D1·09 · Role + Context + Task + Format</span>
 </header>
-<div class="formula-bar"><strong>Prompt Formula:</strong> <span>Role + Context + Task + Format → better results every time. Edit context fields before running.</span></div>
+<div class="formula-bar">
+  <strong>Prompt Formula:</strong>
+  <span>Role &nbsp;+&nbsp; Context &nbsp;+&nbsp; Task &nbsp;+&nbsp; Format &nbsp;→&nbsp; better results every time</span>
+</div>
+
 <div class="layout">
   <div class="sidebar" id="sidebar"></div>
   <div class="main">
     <div class="prompt-area" id="prompt-area">
-      <div class="empty-state"><div style="font-size:40px">🔬</div><h3>Select a prompt to begin</h3><p>Choose any of the 15 prompts from the left sidebar, fill in your context, then run it.</p></div>
+      <div class="empty-state">
+        <h3>Select a prompt to begin</h3>
+        <p>Start with <strong>Fault Pattern Analysis</strong> (Exercise A), then <strong>Decision Stress-Test</strong> (Exercise B), then <strong>Team Briefing</strong> (Exercise C).</p>
+      </div>
     </div>
-    <footer>TAQA LEAD · Module 2 · Built by <a href="#">VectorEd</a></footer>
+    <footer>TAQA LEAD Programme · Module 2 · AI Prompt Lab</footer>
   </div>
 </div>
+
 <script>
-const PROMPTS=[
-  {id:1,cat:'Analyse',catColor:'var(--teal)',catBg:'var(--teal-xl)',name:'Fault Pattern Analysis',template:'Analyse this work order log and tell me: which asset type generates the most unplanned faults, the three most common fault descriptions, and whether there is a timing pattern.\n\nWork order log:\n[PASTE_YOUR_LOG]',fields:[{id:'PASTE_YOUR_LOG',label:'Work order log (paste data or describe the pattern)',rows:5}]},
-  {id:2,cat:'Analyse',catColor:'var(--teal)',catBg:'var(--teal-xl)',name:'Backlog Triage',template:'Rank these open work orders by urgency using: asset criticality, time open, and fault severity. Flag any open more than 14 days.\n\nWork orders:\n[WORK_ORDER_LIST]',fields:[{id:'WORK_ORDER_LIST',label:'Open work orders (asset name, fault type, days open)',rows:5}]},
-  {id:3,cat:'Analyse',catColor:'var(--teal)',catBg:'var(--teal-xl)',name:'Cost Trend Review',template:'Analyse maintenance cost data for [ASSET_NAME] and identify whether costs are increasing, stable, or decreasing. Suggest the most likely explanation.\n\nCost data:\n[COST_DATA]',fields:[{id:'ASSET_NAME',label:'Asset name',rows:1},{id:'COST_DATA',label:'Cost data by year',rows:3}]},
-  {id:4,cat:'Analyse',catColor:'var(--teal)',catBg:'var(--teal-xl)',name:'KPI Sense-Check',template:'Review these KPIs and tell me which are lagging vs leading indicators. Suggest one additional leading indicator I am missing.\n\nCurrent KPIs:\n[CURRENT_KPIS]',fields:[{id:'CURRENT_KPIS',label:'Your current KPIs (one per line)',rows:4}]},
-  {id:5,cat:'Analyse',catColor:'var(--teal)',catBg:'var(--teal-xl)',name:'Inspection Gap Finder',template:'Compare this inspection schedule vs completions. Identify gaps and flag assets that missed two or more consecutive inspections.\n\nScheduled:\n[SCHEDULED]\n\nCompleted:\n[COMPLETED]',fields:[{id:'SCHEDULED',label:'Scheduled inspections',rows:3},{id:'COMPLETED',label:'Inspections completed',rows:3}]},
-  {id:6,cat:'Draft',catColor:'var(--blue)',catBg:'var(--blue-lt)',name:'Handover Note',template:'Write a professional end-of-shift handover note including outstanding tasks, assets under monitoring, and one thing the next shift must not miss.\n\nShift events:\n[SHIFT_EVENTS]',fields:[{id:'SHIFT_EVENTS',label:'What happened during the shift',rows:5}]},
-  {id:7,cat:'Draft',catColor:'var(--blue)',catBg:'var(--blue-lt)',name:'Incident Summary',template:'Draft a factual incident summary. Include timeline, actions taken, current status, and next steps. Tone: clear and factual.\n\nIncident:\n[INCIDENT_DESCRIPTION]',fields:[{id:'INCIDENT_DESCRIPTION',label:'What happened',rows:5}]},
-  {id:8,cat:'Draft',catColor:'var(--blue)',catBg:'var(--blue-lt)',name:'Team Briefing',template:'Write a two-minute verbal briefing for my team about the following change. Include one comprehension check question at the end.\n\nChange:\n[CHANGE_DESCRIPTION]',fields:[{id:'CHANGE_DESCRIPTION',label:'What is changing and why',rows:3}]},
-  {id:9,cat:'Draft',catColor:'var(--blue)',catBg:'var(--blue-lt)',name:'Work Order Description',template:'Write a complete work order description including safety considerations and definition of done.\n\nAsset: [ASSET]\nLocation: [LOCATION]\nTask: [TASK_DESCRIPTION]',fields:[{id:'ASSET',label:'Asset name/ID',rows:1},{id:'LOCATION',label:'Location',rows:1},{id:'TASK_DESCRIPTION',label:'What needs to be done',rows:3}]},
-  {id:10,cat:'Draft',catColor:'var(--blue)',catBg:'var(--blue-lt)',name:'Escalation Email',template:'Draft a clear escalation email including current situation, what I have done, what I need, and by when.\n\nIssue:\n[ISSUE]\n\nActions taken:\n[ACTIONS_TAKEN]\n\nWhat I need:\n[WHAT_I_NEED]',fields:[{id:'ISSUE',label:'The issue',rows:3},{id:'ACTIONS_TAKEN',label:'What you have done',rows:2},{id:'WHAT_I_NEED',label:'What you need and by when',rows:2}]},
-  {id:11,cat:'Think',catColor:'var(--purple)',catBg:'var(--purple-lt)',name:'Decision Stress-Test',template:'I am deciding whether to [DECISION]. Give me the three most important questions I should ask before committing, and what data would change my answer.',fields:[{id:'DECISION',label:'The decision you are weighing',rows:3}]},
-  {id:12,cat:'Think',catColor:'var(--purple)',catBg:'var(--purple-lt)',name:'Root Cause Prompt',template:'Help me apply the 5 Whys to this problem: [PROBLEM]. Ask me each Why in sequence and summarise the root cause when we reach it.',fields:[{id:'PROBLEM',label:'The problem',rows:3}]},
-  {id:13,cat:'Think',catColor:'var(--purple)',catBg:'var(--purple-lt)',name:'Risk Assessment',template:'I am planning to [ACTION]. What are the top three risks, what is the most likely failure mode, and what single control reduces risk the most?',fields:[{id:'ACTION',label:'What you are planning',rows:3}]},
-  {id:14,cat:'Think',catColor:'var(--purple)',catBg:'var(--purple-lt)',name:'CI Method Selection',template:'My team has this recurring problem: [PROBLEM_DESCRIPTION]. Should I use PDCA, DMAIC, or Kaizen? Explain your reasoning in two sentences.',fields:[{id:'PROBLEM_DESCRIPTION',label:'The recurring problem',rows:3}]},
-  {id:15,cat:'Think',catColor:'var(--purple)',catBg:'var(--purple-lt)',name:'Standard Work Check',template:'Review the current process my team follows for [PROCESS_NAME]. Identify unclear steps, missing steps, and steps that cause unnecessary waiting or rework.\n\nCurrent steps:\n[CURRENT_STEPS]',fields:[{id:'PROCESS_NAME',label:'Process name',rows:1},{id:'CURRENT_STEPS',label:'Current steps as numbered list',rows:5}]},
+const API_ENDPOINT = '/api/chat';
+
+// ── PRE-LOADED TAQA SCENARIOS ─────────────────────────────────────────────────
+const SCENARIOS = {
+
+  1: {  // Fault Pattern Analysis
+    context: `You manage maintenance planning for a cluster of substations in Abu Dhabi's Eastern Industrial Zone. Your CMMS has flagged a rising backlog over the past 3 weeks. Your line manager wants to know which asset is causing the most disruption and why — before the monthly operations review on Thursday.`,
+    dataLabel: `Work Order Log — Eastern Zone Substations (April 2025)`,
+    data:
+`WO-2847 | 132kV Feeder F7     | Relay trip — incorrect calibration  | 03-Apr | Closed  | 14 days open
+WO-2856 | 33kV Transformer T3-B | Oil leak — gasket failure           | 08-Apr | Open    |  9 days open
+WO-2871 | 33kV Switchboard SW-14| Overtemperature alarm               | 10-Apr | Closed  |  3 days open
+WO-2883 | 132kV Feeder F7     | Relay trip — incorrect calibration  | 15-Apr | Open    |  2 days open
+WO-2891 | 220kV Transformer T1-A| Cooling fan failure                 | 17-Apr | Open    |  5 days open
+WO-2902 | 33kV Feeder F12     | Cable termination fault              | 19-Apr | Closed  |  2 days open
+WO-2908 | 132kV Feeder F7     | Relay trip — protection operated    | 21-Apr | Open    |  1 day  open
+WO-2913 | 33kV Transformer T3-B | Oil leak — gasket failure           | 22-Apr | Open    |  0 days open
+WO-2919 | 33kV Switchboard SW-09| Earth fault indication              | 23-Apr | Open    |  0 days open
+WO-2924 | 220kV Bus-Section CB  | Mechanism fault — slow operation   | 23-Apr | Open    |  0 days open`,
+    insight: `Look carefully at Feeder F7. It appears three times — same fault type, not resolved. That is not a maintenance backlog problem. That is a root cause problem.`,
+    insightLabel: `What to look for`,
+    debrief: `After reading Claude's analysis: Did it spot the Feeder F7 pattern? Did it distinguish between a symptom (the trip) and the cause (calibration)? What would you do differently if you refined the prompt?`
+  },
+
+  11: {  // Decision Stress-Test
+    context: `You are a maintenance team leader at a TAQA Transmission substation commissioned in 1991 — 9 years past its original 25-year design life. It serves three industrial zones including an active data centre with no backup supply route.`,
+    dataLabel: `Your Situation`,
+    data:
+`Asset:          220kV Main Substation — Al Mussafah Industrial Zone
+Age:            34 years (design life: 25 years)
+Fault history:  7 unplanned outages in the last 18 months (up from 2 in the previous period)
+Maintenance cost trend:
+  2022: AED 2.1 million
+  2023: AED 2.8 million
+  2024: AED 3.6 million  (+43% over 3 years)
+Redundancy:     None — single-supply zone
+Capital replacement: Budgeted for 2029
+Your manager's request: Reduce maintenance spend by 15% this financial year to meet department targets`,
+    insight: `There is a tension here between short-term budget compliance and long-term reliability risk. A good stress-test will surface the questions you need to answer before you commit either way.`,
+    insightLabel: `What this decision is really about`,
+    debrief: `After reading Claude's questions: Which question surprised you most? Which data point would most change your decision? What would you tell your manager on Monday?`
+  },
+
+  8: {  // Team Briefing
+    context: `You are a team leader managing 8 field engineers across two substations. A new CMMS mobile app is being rolled out organisation-wide. Your team goes live on Sunday 8 June — three days from now.`,
+    dataLabel: `Your Situation`,
+    data:
+`Change:         Move from paper-based daily inspection reports to digital logging via CMMS mobile app
+Go-live:        Sunday 8 June (3 days away)
+Team size:      8 field engineers
+Known concerns:
+  - Two senior engineers say the app will slow them down in the field
+  - One engineer refuses to use a smartphone ("not my job")
+  - Two engineers were not at the training session last week
+  - All others have completed training but have not used the app in a real shift yet
+What you need:  Full team compliance from Day 1. No paper reports accepted after Sunday.
+Your Friday briefing window: 15 minutes before the morning shift handover`,
+    insight: `The briefing needs to acknowledge the concerns without validating the resistance. It also needs to be short — 15 minutes is a hard limit in a shift-handover context.`,
+    insightLabel: `What makes this briefing difficult`,
+    debrief: `After reading Claude's draft: Is the tone right for your team? Does it address the three resistant engineers specifically? What would you change before delivering it on Friday?`
+  }
+};
+
+// ── PROMPTS DATA ──────────────────────────────────────────────────────────────
+const PROMPTS = [
+  {
+    id:1, cat:'Analyse', catColor:'var(--teal)', catBg:'var(--teal-xl)',
+    name:'Fault Pattern Analysis', exercise:'A',
+    template:'You are a maintenance operations advisor for TAQA Transmission in Abu Dhabi.\n\nContext: [CONTEXT]\n\nAnalyse this work order log:\n\n[LOG]\n\nTell me:\n1. Which asset is causing the most disruption and why\n2. The top three fault types by frequency\n3. Any pattern that suggests a recurring root cause (not just a recurring symptom)\n4. One specific action I should take before Thursday\'s operations review',
+    fields:[
+      {id:'CONTEXT', label:'Your situation (pre-filled — edit or replace with your own)', rows:3},
+      {id:'LOG', label:'Work order log (pre-filled — edit or replace with your own data)', rows:8},
+    ],
+  },
+  {
+    id:2, cat:'Analyse', catColor:'var(--teal)', catBg:'var(--teal-xl)',
+    name:'Backlog Triage',
+    template:'You are a maintenance planning advisor for TAQA Transmission.\n\nHere is my team\'s open work order list. Rank them by urgency using: asset criticality, days open, and fault severity. Flag any open more than 14 days and recommend which three to resolve first.\n\nWork orders:\n[WORK_ORDER_LIST]',
+    fields:[{id:'WORK_ORDER_LIST',label:'Your open work orders (asset name, fault type, days open)',rows:6}],
+  },
+  {
+    id:3, cat:'Analyse', catColor:'var(--teal)', catBg:'var(--teal-xl)',
+    name:'Cost Trend Review',
+    template:'You are a maintenance cost advisor for TAQA Transmission.\n\nHere is maintenance cost data for [ASSET_NAME]. Identify whether costs are increasing, stable, or decreasing. Suggest the most likely explanation and one action to investigate further.\n\nCost data:\n[COST_DATA]',
+    fields:[
+      {id:'ASSET_NAME',label:'Asset name',rows:1},
+      {id:'COST_DATA',label:'Cost data (e.g. 2022: AED 45,000 · 2023: AED 62,000 · 2024: AED 89,000)',rows:3},
+    ],
+  },
+  {
+    id:4, cat:'Analyse', catColor:'var(--teal)', catBg:'var(--teal-xl)',
+    name:'KPI Sense-Check',
+    template:'You are an operational performance advisor for TAQA Transmission.\n\nHere are the KPIs my team currently tracks. Classify each as lagging or leading. Identify any gap and suggest one additional leading indicator I am missing.\n\nCurrent KPIs:\n[CURRENT_KPIS]',
+    fields:[{id:'CURRENT_KPIS',label:'Your current KPIs (one per line)',rows:5}],
+  },
+  {
+    id:5, cat:'Analyse', catColor:'var(--teal)', catBg:'var(--teal-xl)',
+    name:'Inspection Gap Finder',
+    template:'You are a maintenance compliance advisor for TAQA Transmission.\n\nHere is this month\'s inspection schedule versus what was completed. Identify gaps, flag assets that missed two or more consecutive inspections, and estimate the risk level for each.\n\nScheduled:\n[SCHEDULED]\n\nCompleted:\n[COMPLETED]',
+    fields:[
+      {id:'SCHEDULED',label:'Scheduled inspections this month',rows:3},
+      {id:'COMPLETED',label:'Inspections actually completed',rows:3},
+    ],
+  },
+  {
+    id:6, cat:'Draft', catColor:'var(--blue)', catBg:'var(--blue-lt)',
+    name:'Handover Note',
+    template:'You are writing a professional end-of-shift handover note for a TAQA Transmission maintenance team.\n\nShift events:\n[SHIFT_EVENTS]\n\nWrite the handover note. Include: outstanding tasks, assets under monitoring, and one thing the next shift must not miss. Tone: clear, direct, factual.',
+    fields:[{id:'SHIFT_EVENTS',label:'What happened during the shift (events, incidents, jobs completed)',rows:5}],
+  },
+  {
+    id:7, cat:'Draft', catColor:'var(--blue)', catBg:'var(--blue-lt)',
+    name:'Incident Summary',
+    template:'You are drafting a factual incident summary for TAQA Transmission.\n\nIncident:\n[INCIDENT_DESCRIPTION]\n\nWrite a clear summary including: timeline, immediate actions taken, current status, and next steps. Tone: factual and professional. No blame language.',
+    fields:[{id:'INCIDENT_DESCRIPTION',label:'Describe what happened — what, when, where, what was done',rows:5}],
+  },
+  {
+    id:8, cat:'Draft', catColor:'var(--blue)', catBg:'var(--blue-lt)',
+    name:'Team Briefing', exercise:'C',
+    template:'You are a team leader at TAQA Transmission preparing a 15-minute verbal briefing.\n\nContext:\n[CONTEXT]\n\nChange to communicate:\n[CHANGE]\n\nWrite the briefing as spoken words — not bullet points. Include: what is changing and why, what each person needs to do, how you will handle resistance, and one question to check understanding at the end. Maximum 15 minutes to deliver.',
+    fields:[
+      {id:'CONTEXT', label:'Your situation (pre-filled — edit or replace with your own)', rows:4},
+      {id:'CHANGE', label:'The change you need to communicate (pre-filled — edit or replace)', rows:4},
+    ],
+  },
+  {
+    id:9, cat:'Draft', catColor:'var(--blue)', catBg:'var(--blue-lt)',
+    name:'Work Order Description',
+    template:'You are writing a work order for TAQA Transmission maintenance.\n\nAsset: [ASSET]\nLocation: [LOCATION]\nTask: [TASK_DESCRIPTION]\n\nWrite a complete work order description including safety considerations, step sequence, required resources, and the definition of done.',
+    fields:[
+      {id:'ASSET',label:'Asset name/ID',rows:1},
+      {id:'LOCATION',label:'Location (substation, grid section)',rows:1},
+      {id:'TASK_DESCRIPTION',label:'What needs to be done',rows:3},
+    ],
+  },
+  {
+    id:10, cat:'Draft', catColor:'var(--blue)', catBg:'var(--blue-lt)',
+    name:'Escalation Email',
+    template:'You are drafting an escalation email for a TAQA Transmission manager.\n\nIssue: [ISSUE]\nWhat I have already done: [ACTIONS_TAKEN]\nWhat I need: [WHAT_I_NEED]\n\nWrite a clear, professional escalation email. Include the situation, what has been done, what is needed, and a clear deadline. Subject line included.',
+    fields:[
+      {id:'ISSUE',label:'Describe the issue clearly',rows:3},
+      {id:'ACTIONS_TAKEN',label:'What you have already tried or done',rows:2},
+      {id:'WHAT_I_NEED',label:'What you need from your manager and by when',rows:2},
+    ],
+  },
+  {
+    id:11, cat:'Think', catColor:'var(--purple)', catBg:'var(--purple-lt)',
+    name:'Decision Stress-Test', exercise:'B',
+    template:'You are an operations management advisor for TAQA Transmission.\n\nContext:\n[CONTEXT]\n\nDecision I am facing:\n[DECISION]\n\nGive me:\n1. The three most important questions I should answer before I decide\n2. The data point that would most change my answer\n3. The risk I am most likely underweighting\n4. What a cautious manager would decide — and what an ambitious one would decide',
+    fields:[
+      {id:'CONTEXT', label:'Your situation (pre-filled — edit or replace with your own)', rows:5},
+      {id:'DECISION', label:'The decision you are facing (pre-filled — edit or replace)', rows:3},
+    ],
+  },
+  {
+    id:12, cat:'Think', catColor:'var(--purple)', catBg:'var(--purple-lt)',
+    name:'Root Cause Prompt',
+    template:'You are a root cause analysis coach for TAQA Transmission.\n\nProblem: [PROBLEM]\n\nApply the 5 Whys method. Ask me each Why one at a time. After each answer I give you, ask the next Why. When we reach a system or process cause — not a person — summarise the root cause and suggest one corrective action.',
+    fields:[{id:'PROBLEM',label:'Describe the operational problem (use the 5 Whys tool for the full guided session)',rows:3}],
+  },
+  {
+    id:13, cat:'Think', catColor:'var(--purple)', catBg:'var(--purple-lt)',
+    name:'Risk Assessment',
+    template:'You are a risk assessment advisor for TAQA Transmission.\n\nI am planning to: [ACTION]\n\nIdentify the top three risks, the most likely failure mode, and the single control that would reduce risk the most. Be specific to TAQA\'s operating context.',
+    fields:[{id:'ACTION',label:'What are you planning to do?',rows:3}],
+  },
+  {
+    id:14, cat:'Think', catColor:'var(--purple)', catBg:'var(--purple-lt)',
+    name:'CI Method Selection',
+    template:'You are a continuous improvement advisor for TAQA Transmission.\n\nProblem: [PROBLEM_DESCRIPTION]\n\nShould I use PDCA, DMAIC, or a Kaizen event to tackle this? Explain your routing in three sentences. Then give me the first three steps of whichever method you recommend.',
+    fields:[{id:'PROBLEM_DESCRIPTION',label:'Describe the recurring operational problem',rows:3}],
+  },
+  {
+    id:15, cat:'Think', catColor:'var(--purple)', catBg:'var(--purple-lt)',
+    name:'Standard Work Check',
+    template:'You are a standard work advisor for TAQA Transmission.\n\nProcess: [PROCESS_NAME]\n\nCurrent steps:\n[CURRENT_STEPS]\n\nIdentify: any unclear steps, any missing steps, any steps that create waiting or rework. Then suggest the revised sequence.',
+    fields:[
+      {id:'PROCESS_NAME',label:'Process name (e.g. end-of-shift handover, fault escalation)',rows:1},
+      {id:'CURRENT_STEPS',label:'Current steps as your team actually does them (numbered list)',rows:5},
+    ],
+  },
 ];
-const CATS=['Analyse','Draft','Think'];
-let active=null;
-function renderSidebar(){
-  document.getElementById('sidebar').innerHTML=CATS.map(cat=>{
-    const catP=PROMPTS.filter(p=>p.cat===cat);
-    return`<div class="cat-section cat-${cat.toLowerCase()}">
+
+// Scenario field mapping: which field ID gets which data
+const SCENARIO_FIELD_MAP = {
+  1:  { CONTEXT: 'context', LOG: 'data' },
+  8:  { CONTEXT: 'context', CHANGE: 'data' },
+  11: { CONTEXT: 'context', DECISION: 'data' },
+};
+
+const CATS = ['Analyse','Draft','Think'];
+let active = null;
+
+function renderSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.innerHTML = CATS.map(cat => {
+    const catPrompts = PROMPTS.filter(p => p.cat === cat);
+    return `<div class="cat-section cat-${cat.toLowerCase()}">
       <div class="cat-header">${cat==='Analyse'?'📊':cat==='Draft'?'✏️':'💡'} ${cat}</div>
-      ${catP.map(p=>`<div class="prompt-item ${active===p.id?'active':''}" onclick="selectPrompt(${p.id})"><div class="prompt-num">Prompt ${p.id}</div><div class="prompt-name">${p.name}</div></div>`).join('')}
+      ${catPrompts.map(p => `
+        <div class="prompt-item ${active===p.id?'active':''}" onclick="selectPrompt(${p.id})">
+          <div class="prompt-num">Prompt ${p.id}${p.exercise ? ` · Exercise ${p.exercise}` : ''}</div>
+          <div class="prompt-name">${p.name}${SCENARIOS[p.id] ? '<span class="scenario-tag">SCENARIO</span>' : ''}</div>
+        </div>`).join('')}
     </div>`;
   }).join('');
 }
-function selectPrompt(id){
-  active=id;
+
+function selectPrompt(id) {
+  active = id;
   renderSidebar();
-  const p=PROMPTS.find(x=>x.id===id);
-  document.getElementById('prompt-area').innerHTML=`
+  const p = PROMPTS.find(x => x.id === id);
+  const sc = SCENARIOS[id];
+  const area = document.getElementById('prompt-area');
+
+  const scenarioPanel = sc ? `
+    <div class="scenario-panel" id="scenario-panel-${id}">
+      <div class="scenario-panel-header">
+        <h4>📋 Pre-loaded TAQA Scenario — use as-is or replace with your own</h4>
+        <div class="scenario-toggle-btns">
+          <button class="scen-btn scen-btn-use" onclick="useScenario(${id})">Use This Scenario</button>
+          <button class="scen-btn scen-btn-own" onclick="clearScenario(${id})">Use My Own Data</button>
+        </div>
+      </div>
+      <div class="scenario-body">
+        <div class="scenario-context-label">Context</div>
+        <div class="scenario-context-text">${sc.context}</div>
+        <div class="scenario-data-label">${sc.dataLabel}</div>
+        <div class="scenario-data-pre">${sc.data}</div>
+        ${sc.insight ? `<div class="scenario-insight">
+          <div class="scenario-insight-label">${sc.insightLabel}</div>
+          <div class="scenario-insight-text">${sc.insight}</div>
+        </div>` : ''}
+      </div>
+    </div>` : '';
+
+  area.innerHTML = `
+    ${scenarioPanel}
     <div class="prompt-editor">
       <div class="pe-header">
         <span class="pe-cat-badge" style="background:${p.catBg};color:${p.catColor}">${p.cat}</span>
         <span class="pe-title">${p.name}</span>
       </div>
       <div class="pe-body">
-        <div class="pe-label">Prompt template</div>
-        <div class="pe-prompt" id="pe-display">${p.template}</div>
-        <div class="pe-label">Fill in your context</div>
-        ${p.fields.map(f=>`<div class="context-field"><label>${f.label}</label><textarea id="ctx-${f.id}" rows="${f.rows}" placeholder="Enter ${f.label.toLowerCase()}…" oninput="updatePreview(${p.id})"></textarea></div>`).join('')}
-        <button class="run-btn" id="run-btn-${id}" onclick="runPrompt(${id})">🤖 Run with Claude</button>
+        <div class="pe-label">Prompt template (updates as you fill in context below)</div>
+        <div class="pe-prompt" id="pe-display-${id}">${p.template}</div>
+        <div class="pe-label">Your context</div>
+        ${p.fields.map(f => `
+          <div class="context-field">
+            <label>${f.label}</label>
+            <textarea id="ctx-${id}-${f.id}" rows="${f.rows}" placeholder="${sc ? 'Click "Use This Scenario" above to pre-fill, or type your own…' : 'Enter ' + f.label.toLowerCase() + '…'}" oninput="updatePreview(${id})"></textarea>
+          </div>`).join('')}
+        <button class="run-btn" id="run-btn-${id}" onclick="runPrompt(${id})">
+          <span>🤖</span> Run with Claude
+        </button>
         <div id="response-${id}"></div>
+        ${sc && sc.debrief ? `<div class="debrief-box"><p><strong>After reading the response:</strong> ${sc.debrief}</p></div>` : ''}
       </div>
     </div>`;
 }
-function updatePreview(id){
-  const p=PROMPTS.find(x=>x.id===id);
-  let preview=p.template;
-  p.fields.forEach(f=>{const val=document.getElementById(`ctx-${f.id}`)?.value||`[${f.id}]`;preview=preview.replace(new RegExp(`\\[${f.id}\\]`,'g'),val||`[${f.id}]`);});
-  const d=document.getElementById('pe-display');
-  if(d)d.textContent=preview;
+
+function useScenario(id) {
+  const sc = SCENARIOS[id];
+  const fieldMap = SCENARIO_FIELD_MAP[id];
+  if (!sc || !fieldMap) return;
+  Object.entries(fieldMap).forEach(([fieldId, scKey]) => {
+    const el = document.getElementById(`ctx-${id}-${fieldId}`);
+    if (el) {
+      el.value = sc[scKey];
+      el.classList.add('prefilled');
+    }
+  });
+  updatePreview(id);
+  // Scroll to fields
+  document.getElementById(`ctx-${id}-${Object.keys(fieldMap)[0]}`)?.scrollIntoView({behavior:'smooth',block:'center'});
 }
-async function runPrompt(id){
-  const p=PROMPTS.find(x=>x.id===id);
-  let finalPrompt=p.template;
-  p.fields.forEach(f=>{const val=document.getElementById(`ctx-${f.id}`)?.value?.trim()||'(not provided)';finalPrompt=finalPrompt.replace(new RegExp(`\\[${f.id}\\]`,'g'),val);});
-  const btn=document.getElementById(`run-btn-${id}`);
-  const respDiv=document.getElementById(`response-${id}`);
-  btn.disabled=true;
-  respDiv.innerHTML=`<div class="response-area"><div class="loading-row"><div class="spinner"></div>Generating response…</div></div>`;
-  const sys='You are an operational excellence advisor for TAQA Transmission managers in Abu Dhabi. Be direct, practical, and concise. Reference TAQA context where relevant.';
-  try{
-    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:sys,messages:[{role:'user',content:finalPrompt}]})});
-    const data=await res.json();
-    if(data.error)throw new Error(data.error.message);
-    const text=data.content[0].text;
-    respDiv.innerHTML=`<div class="response-area"><div class="response-header"><h4>Claude Response</h4><button class="copy-btn" onclick="copyResp(${id})">Copy</button></div><div class="response-text" id="resp-text-${id}">${text}</div></div>`;
-    window._resp=window._resp||{};
-    window._resp[id]=text;
-  }catch(e){
-    respDiv.innerHTML=`<div class="response-area" style="background:var(--red-lt);border-color:var(--red)"><span style="color:var(--red)">Error: ${e.message}</span></div>`;
+
+function clearScenario(id) {
+  const p = PROMPTS.find(x => x.id === id);
+  p.fields.forEach(f => {
+    const el = document.getElementById(`ctx-${id}-${f.id}`);
+    if (el) { el.value = ''; el.classList.remove('prefilled'); }
+  });
+  updatePreview(id);
+}
+
+function updatePreview(id) {
+  const p = PROMPTS.find(x => x.id === id);
+  let preview = p.template;
+  p.fields.forEach(f => {
+    const val = document.getElementById(`ctx-${id}-${f.id}`)?.value || `[${f.id}]`;
+    preview = preview.replace(new RegExp(`\\[${f.id}\\]`, 'g'), val || `[${f.id}]`);
+  });
+  const display = document.getElementById(`pe-display-${id}`);
+  if (display) display.textContent = preview;
+}
+
+async function runPrompt(id) {
+  const p = PROMPTS.find(x => x.id === id);
+  let finalPrompt = p.template;
+  p.fields.forEach(f => {
+    const val = document.getElementById(`ctx-${id}-${f.id}`)?.value?.trim() || '(not provided)';
+    finalPrompt = finalPrompt.replace(new RegExp(`\\[${f.id}\\]`, 'g'), val);
+  });
+
+  const btn = document.getElementById(`run-btn-${id}`);
+  const respDiv = document.getElementById(`response-${id}`);
+  btn.disabled = true;
+  respDiv.innerHTML = `<div class="response-area"><div class="loading-row"><div class="spinner"></div>Claude is analysing…</div></div>`;
+
+  const systemPrompt = `You are an operational excellence advisor for managers at TAQA Transmission in Abu Dhabi — a critical infrastructure company managing power and water transmission networks across the UAE. Your responses are practical, direct, and grounded in operational reality. Keep responses concise and actionable. Reference TAQA's context (substations, CMMS, work orders, asset maintenance, grid reliability) where relevant. Never pad responses with unnecessary caveats.`;
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 900,
+        system: systemPrompt,
+        messages: [{role: 'user', content: finalPrompt}]
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    const text = data.content[0].text;
+    respDiv.innerHTML = `
+      <div class="response-area">
+        <div class="response-header">
+          <h4>Claude's Response</h4>
+          <button class="copy-btn" onclick="copyResponse(${id})">Copy</button>
+        </div>
+        <div class="response-text" id="resp-text-${id}">${escHtml(text)}</div>
+      </div>`;
+    btn.disabled = false;
+    window.__responses = window.__responses || {};
+    window.__responses[id] = text;
+  } catch(e) {
+    respDiv.innerHTML = `<div class="response-area" style="background:var(--red-lt);border-color:var(--red)"><span style="color:var(--red)">Error: ${e.message}</span></div>`;
+    btn.disabled = false;
   }
-  btn.disabled=false;
 }
-function copyResp(id){const t=window._resp?.[id]||'';navigator.clipboard.writeText(t).then(()=>{const b=document.querySelector(`[onclick="copyResp(${id})"]`);if(b){b.textContent='Copied!';setTimeout(()=>b.textContent='Copy',2000);}});}
+
+function escHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function copyResponse(id) {
+  const text = window.__responses?.[id] || '';
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector(`[onclick="copyResponse(${id})"]`);
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy', 2000); }
+  });
+}
+
+function dismissBriefing() {
+  var el = document.getElementById('briefing-overlay');
+  if (el) { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(() => el.classList.add('hidden'), 300); }
+}
+
 renderSidebar();
+// Auto-open Exercise A on load after briefing
+document.querySelector('.br-btn').addEventListener('click', () => setTimeout(() => selectPrompt(1), 400));
 </script>
 </body>
 </html>

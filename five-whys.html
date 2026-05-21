@@ -12,7 +12,17 @@ header{background:var(--dark);padding:14px 20px;display:flex;align-items:center;
 .badge{background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.06em;}
 header h1{color:#fff;font-size:17px;font-weight:600;flex:1;}
 .header-tag{color:#aaa;font-size:12px;}
+
+/* API key banner */
+
+
+
+
+
+/* Main layout */
 .main{display:flex;flex:1;overflow:hidden;}
+
+/* Chain sidebar */
 .chain-panel{width:260px;background:#fff;border-right:2px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
 .chain-header{padding:14px 16px;background:var(--teal);color:#fff;}
 .chain-header h3{font-size:14px;font-weight:700;}
@@ -29,6 +39,8 @@ header h1{color:#fff;font-size:17px;font-weight:600;flex:1;}
 .chain-empty{color:var(--light);font-size:12px;text-align:center;padding:20px 0;line-height:1.6;}
 .export-btn{margin:12px;padding:8px;background:var(--teal-xl);border:1.5px solid var(--teal-lt);border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;color:var(--teal);text-align:center;}
 .export-btn:hover{background:var(--teal);color:#fff;}
+
+/* Chat area */
 .chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 .messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
 .msg{max-width:80%;animation:fadeUp .2s ease;}
@@ -45,6 +57,8 @@ header h1{color:#fff;font-size:17px;font-weight:600;flex:1;}
 .typing span:nth-child(2){animation-delay:.15s;}
 .typing span:nth-child(3){animation-delay:.3s;}
 @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+
+/* Input */
 .input-area{padding:12px 16px;background:#fff;border-top:2px solid var(--border);display:flex;gap:10px;}
 #problem-section{padding:16px;background:var(--teal-xl);border-bottom:2px solid var(--teal-lt);}
 #problem-section h3{font-size:14px;font-weight:700;color:var(--teal);margin-bottom:8px;}
@@ -56,30 +70,76 @@ header h1{color:#fff;font-size:17px;font-weight:600;flex:1;}
 #send-btn{padding:10px 20px;background:var(--teal);border:none;border-radius:8px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0;}
 #send-btn:hover{background:#0d5e49;}
 #send-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* Complete state */
 .complete-banner{background:var(--orange-lt);border:2px solid var(--orange);border-radius:10px;padding:14px 18px;margin:0 16px 12px;}
 .complete-banner h3{color:var(--orange);font-size:15px;font-weight:700;margin-bottom:6px;}
 .complete-banner p{font-size:13px;color:var(--mid);line-height:1.5;}
 .restart-btn{display:inline-block;margin-top:10px;padding:8px 18px;background:var(--teal);border:none;border-radius:7px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;}
+
 footer{text-align:center;padding:8px;font-size:11px;color:var(--light);background:#fff;border-top:1px solid var(--border);}
 footer a{color:var(--teal);text-decoration:none;}
+
+/* ── BRIEFING OVERLAY ──────────────────────────────────────────────── */
+#briefing-overlay{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#00093F 0%,#0D1F5A 60%,#001830 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;}
+#briefing-overlay.hidden{display:none;}
+.br-badge{background:#FF5F00;color:#fff;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:16px;}
+.br-session{color:#AAAAAA;font-size:13px;margin-bottom:6px;letter-spacing:.06em;}
+.br-title{color:#fff;font-size:26px;font-weight:700;line-height:1.25;margin-bottom:14px;max-width:620px;}
+.br-box{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:14px 22px;max-width:560px;margin-bottom:18px;}
+.br-box-label{color:#FF5F00;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
+.br-box-text{color:#DDDDDD;font-size:14px;line-height:1.6;}
+.br-box-text strong{color:#fff;}
+.br-steps{max-width:520px;margin-bottom:24px;text-align:left;}
+.br-step{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;}
+.br-num{background:#FF5F00;color:#fff;font-size:11px;font-weight:700;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.br-text{color:#CCCCCC;font-size:13.5px;line-height:1.5;}
+.br-text strong{color:#fff;}
+.br-btn{background:#FF5F00;color:#fff;border:none;font-size:15px;font-weight:700;padding:13px 38px;border-radius:8px;cursor:pointer;letter-spacing:.04em;transition:background .2s;}
+.br-btn:hover{background:#D94E00;}
+.br-footer{color:#555;font-size:11px;margin-top:12px;}
+
 </style>
 </head>
 <body>
+
+<div id="briefing-overlay">
+  <div class="br-badge">AI COACH</div>
+  <div class="br-session">SESSION D2·08  ·  Root Cause Analysis</div>
+  <div class="br-title">5 Whys AI Coach</div>
+  <div class="br-box">
+    <div class="br-box-label">THE CONCEPT: ROOT CAUSE, NOT SYMPTOM</div>
+    <div class="br-box-text">Most problems get fixed at the symptom level and return next week. The 5 Whys method asks <strong>why</strong> five times until you reach the actual cause — which is almost always a process or system gap, not a person.</div>
+  </div>
+  <div class="br-steps"><div class="br-step"><div class="br-num">1</div><div class="br-text">Describe your operational problem in <strong>one specific sentence</strong>. Not vague — specific.</div></div>
+<div class="br-step"><div class="br-num">2</div><div class="br-text">Claude will ask you <strong>Why does this happen?</strong> Answer honestly each time.</div></div>
+<div class="br-step"><div class="br-num">3</div><div class="br-text">Keep asking why until you reach something that, if fixed, <strong>would stop this problem recurring</strong>.</div></div>
+<div class="br-step"><div class="br-num">4</div><div class="br-text">If you reach <em>'human error'</em> — that is not a root cause. <strong>Ask: why did the system allow that error?</strong></div></div></div>
+  <button class="br-btn" onclick="dismissBriefing()">Start the Simulation &rarr;</button>
+  <div class="br-footer">taqa-lead1.vercel.app  ·  TAQA LEAD Module 2</div>
+</div>
 <header>
   <span class="badge">T7</span>
   <h1>5 Whys AI Coach</h1>
   <span class="header-tag">TAQA LEAD · Module 2</span>
 </header>
+
 <div class="main">
   <div class="chain-panel">
-    <div class="chain-header"><h3>Root Cause Chain</h3><p>Builds as you answer each Why</p></div>
-    <div class="chain-body" id="chain-body"><div class="chain-empty">Your root cause chain will appear here.</div></div>
+    <div class="chain-header">
+      <h3>Root Cause Chain</h3>
+      <p>Builds as you answer each Why</p>
+    </div>
+    <div class="chain-body" id="chain-body">
+      <div class="chain-empty">Your root cause chain will appear here as the conversation progresses.</div>
+    </div>
     <button class="export-btn" id="export-btn" onclick="exportChain()" style="display:none">⬇ Export Root Cause Chain</button>
   </div>
+
   <div class="chat-area">
     <div id="problem-section">
       <h3>What is the problem you want to investigate?</h3>
-      <textarea id="problem-input" placeholder="Describe the operational problem your team keeps experiencing."></textarea>
+      <textarea id="problem-input" placeholder="Describe the operational problem your team keeps experiencing. Be specific — name the asset, process, or behaviour that is causing issues."></textarea>
       <button id="problem-start" onclick="startAnalysis()">Begin 5 Whys Analysis →</button>
     </div>
     <div class="messages" id="messages"></div>
@@ -89,60 +149,203 @@ footer a{color:var(--teal);text-decoration:none;}
     </div>
   </div>
 </div>
+
 <footer>TAQA LEAD Programme · Module 2 · Built by <a href="#">VectorEd</a></footer>
+
 <script>
-const API_ENDPOINT='/api/chat';
-let messages=[],whyChain=[],analysisComplete=false,problem='';
-const SYSTEM_PROMPT=`You are a 5 Whys facilitation coach for TAQA Transmission operations managers in Abu Dhabi. Guide the user through root cause analysis using the 5 Whys method. Ask one Why at a time. Challenge vague answers like 'human error'. After 4-6 Whys when you reach a genuine root cause, start your message with ROOT CAUSE IDENTIFIED: followed by the root cause, then summarise the chain. Keep responses under 4 sentences. Be direct and operational.`;
-async function callClaude(userMessage){
-  messages.push({role:'user',content:userMessage});
+const API_ENDPOINT = '/api/chat';
+let messages = [];
+let whyChain = [];
+let analysisComplete = false;
+let problem = '';
+
+
+const SYSTEM_PROMPT = `You are a 5 Whys facilitation coach for operations managers at TAQA Transmission, a power and water infrastructure company in Abu Dhabi managing 11,000km of transmission assets.
+
+Your role is to guide the user through root cause analysis using the 5 Whys method. Rules:
+1. Ask one Why question at a time. Keep it focused and specific to their previous answer.
+2. If their answer is vague or superficial (e.g. "human error", "lack of training"), gently challenge it: ask them to be more specific about what exactly went wrong and why.
+3. Track the depth — after each exchange note internally whether this feels like a root cause (something that, if fixed, would prevent the problem from recurring) or still a symptom.
+4. After 4-6 Whys (when you sense a genuine root cause), summarise the full chain clearly and identify the root cause.
+5. Format: keep responses short — 2-4 sentences maximum. One question at a time.
+6. When you identify the root cause, start your message with "ROOT CAUSE IDENTIFIED:" followed by the root cause statement, then provide the full chain summary.
+7. Use TAQA's operational context — reference substations, work orders, SCADA, maintenance schedules, pipelines where relevant.
+8. Be direct and practical. These are operational managers, not academics.`;
+
+async function callClaude(userMessage) {
+  messages.push({ role: 'user', content: userMessage });
   showTyping();
-  try{
-    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:SYSTEM_PROMPT,messages})});
-    const data=await res.json();
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        system: SYSTEM_PROMPT,
+        messages
+      })
+    });
+    const data = await res.json();
     hideTyping();
-    if(data.error){addMessage('assistant','Error: '+data.error.message);return;}
-    const reply=data.content[0].text;
-    messages.push({role:'assistant',content:reply});
-    addMessage('assistant',reply);
-    parseChain(userMessage,reply);
-  }catch(e){hideTyping();addMessage('assistant','Connection error: '+e.message);}
+    if (data.error) { addMessage('assistant', `Error: ${data.error.message}`); return; }
+    const reply = data.content[0].text;
+    messages.push({ role: 'assistant', content: reply });
+    addMessage('assistant', reply);
+    parseChain(userMessage, reply);
+  } catch(e) {
+    hideTyping();
+    addMessage('assistant', 'Connection error. Check your API key and try again.');
+  }
 }
-function parseChain(userMsg,assistantMsg){
-  if(whyChain.length===0)whyChain.push({type:'problem',text:problem});
-  whyChain.push({type:'why',num:whyChain.length,answer:userMsg});
-  if(assistantMsg.includes('ROOT CAUSE IDENTIFIED:')){
-    analysisComplete=true;
-    const m=assistantMsg.match(/ROOT CAUSE IDENTIFIED:\s*([^\n]+)/);
-    if(m)whyChain.push({type:'rootcause',text:m[1].trim()});
+
+function parseChain(userMsg, assistantMsg) {
+  // Add the user's answer to the chain
+  const whyNum = whyChain.length + 1;
+  if (whyChain.length === 0) {
+    // First exchange — this is the problem statement
+    whyChain.push({ type: 'problem', text: problem });
+  }
+  whyChain.push({ type: 'why', num: whyNum, question: getLastQuestion(), answer: userMsg });
+
+  if (assistantMsg.includes('ROOT CAUSE IDENTIFIED:')) {
+    analysisComplete = true;
+    const rcMatch = assistantMsg.match(/ROOT CAUSE IDENTIFIED:\s*([^\n]+)/);
+    if (rcMatch) whyChain.push({ type: 'rootcause', text: rcMatch[1].trim() });
     showCompleteBanner();
-    document.getElementById('send-btn').disabled=true;
-    document.getElementById('export-btn').style.display='block';
+    document.getElementById('send-btn').disabled = true;
+    document.getElementById('export-btn').style.display = 'block';
   }
   renderChain();
 }
-function renderChain(){
-  const body=document.getElementById('chain-body');
-  if(!whyChain.length){body.innerHTML='<div class="chain-empty">Your root cause chain will appear here.</div>';return;}
-  let html='';
-  whyChain.forEach((item,i)=>{
-    if(item.type==='problem'){html+=`<div class="chain-item"><div class="chain-num">THE PROBLEM</div><div class="chain-problem">${item.text}</div></div><div class="chain-arrow">↓</div>`;}
-    else if(item.type==='why'){html+=`<div class="chain-item"><div class="chain-num">WHY ${item.num}</div><div class="chain-answer">${item.answer}</div></div>`;if(!whyChain[i+1]||whyChain[i+1].type==='why')html+='<div class="chain-arrow">↓</div>';}
-    else if(item.type==='rootcause'){html+=`<div class="chain-arrow">↓</div><div class="root-cause"><div class="chain-num">ROOT CAUSE</div><div class="chain-answer">${item.text}</div></div>`;}
-  });
-  body.innerHTML=html;
+
+function getLastQuestion() {
+  if (messages.length >= 2) {
+    const lastAssistant = messages.filter(m=>m.role==='assistant').pop();
+    if (lastAssistant) {
+      const lines = lastAssistant.content.split('\n').filter(l=>l.trim());
+      return lines[lines.length-1];
+    }
+  }
+  return `Why ${whyChain.length}?`;
 }
-let typingEl=null;
-function showTyping(){typingEl=document.createElement('div');typingEl.className='msg assistant';typingEl.innerHTML='<div class="msg-label">AI Coach</div><div class="typing"><span></span><span></span><span></span></div>';document.getElementById('messages').appendChild(typingEl);scrollBottom();}
-function hideTyping(){if(typingEl){typingEl.remove();typingEl=null;}}
-function addMessage(role,text){const msgs=document.getElementById('messages');const div=document.createElement('div');div.className=`msg ${role}`;div.innerHTML=`<div class="msg-label">${role==='assistant'?'AI Coach':'You'}</div><div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div>`;msgs.appendChild(div);scrollBottom();}
-function scrollBottom(){const m=document.getElementById('messages');m.scrollTop=m.scrollHeight;}
-function showCompleteBanner(){const msgs=document.getElementById('messages');const div=document.createElement('div');div.className='complete-banner';div.innerHTML=`<h3>🎯 Root Cause Identified</h3><p>Analysis complete. The chain is saved in the left panel.</p><button class="restart-btn" onclick="restart()">↩ Analyse a new problem</button>`;msgs.appendChild(div);scrollBottom();}
-async function startAnalysis(){problem=document.getElementById('problem-input').value.trim();if(!problem){alert('Please describe the problem first.');return;}document.getElementById('problem-section').style.display='none';document.getElementById('input-area').style.display='flex';whyChain=[{type:'problem',text:problem}];renderChain();const initial=`I want to investigate this problem using the 5 Whys method: "${problem}"`;addMessage('user',initial);await callClaude(initial);}
-async function sendMessage(){const input=document.getElementById('user-input');const text=input.value.trim();if(!text||analysisComplete)return;input.value='';addMessage('user',text);await callClaude(text);}
-function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
-function exportChain(){let text='TAQA LEAD 5 Whys Root Cause Chain\n'+'='.repeat(40)+'\n\n';whyChain.forEach(item=>{if(item.type==='problem')text+=`PROBLEM:\n${item.text}\n\n`;else if(item.type==='why')text+=`WHY ${item.num}:\n${item.answer}\n\n`;else if(item.type==='rootcause')text+=`ROOT CAUSE:\n${item.text}\n`;});const blob=new Blob([text],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='5whys-analysis.txt';a.click();}
-function restart(){messages=[];whyChain=[];analysisComplete=false;problem='';document.getElementById('messages').innerHTML='';document.getElementById('problem-input').value='';document.getElementById('problem-section').style.display='block';document.getElementById('input-area').style.display='none';document.getElementById('send-btn').disabled=false;document.getElementById('export-btn').style.display='none';renderChain();}
+
+function renderChain() {
+  const body = document.getElementById('chain-body');
+  if (!whyChain.length) { body.innerHTML = '<div class="chain-empty">Your root cause chain will appear here.</div>'; return; }
+
+  let html = '';
+  whyChain.forEach((item, i) => {
+    if (item.type === 'problem') {
+      html += `<div class="chain-item"><div class="chain-num">THE PROBLEM</div><div class="chain-problem">${item.text}</div></div>`;
+      html += '<div class="chain-arrow">↓</div>';
+    } else if (item.type === 'why') {
+      html += `<div class="chain-item"><div class="chain-num">WHY ${item.num}</div><div class="chain-answer">${item.answer}</div></div>`;
+      if (!whyChain[i+1] || whyChain[i+1].type === 'why') html += '<div class="chain-arrow">↓</div>';
+    } else if (item.type === 'rootcause') {
+      html += `<div class="chain-arrow">↓</div><div class="root-cause"><div class="chain-num">ROOT CAUSE</div><div class="chain-answer">${item.text}</div></div>`;
+    }
+  });
+  body.innerHTML = html;
+}
+
+let typingEl = null;
+function showTyping() {
+  typingEl = document.createElement('div');
+  typingEl.className = 'msg assistant';
+  typingEl.innerHTML = '<div class="msg-label">AI Coach</div><div class="typing"><span></span><span></span><span></span></div>';
+  document.getElementById('messages').appendChild(typingEl);
+  scrollBottom();
+}
+function hideTyping() { if (typingEl) { typingEl.remove(); typingEl = null; } }
+
+function addMessage(role, text) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const label = role === 'assistant' ? 'AI Coach' : 'You';
+  div.innerHTML = `<div class="msg-label">${label}</div><div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div>`;
+  msgs.appendChild(div);
+  scrollBottom();
+}
+
+function scrollBottom() {
+  const m = document.getElementById('messages');
+  m.scrollTop = m.scrollHeight;
+}
+
+function showCompleteBanner() {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'complete-banner';
+  div.innerHTML = `<h3>🎯 Root Cause Identified</h3>
+    <p>Your 5 Whys analysis is complete. The chain is saved in the left panel. Export it or share with your team.</p>
+    <button class="restart-btn" onclick="restart()">↩ Analyse a new problem</button>`;
+  msgs.appendChild(div);
+  scrollBottom();
+}
+
+async function startAnalysis() {
+  problem = document.getElementById('problem-input').value.trim();
+  if (!problem) { alert('Please describe the problem first.'); return; }
+
+  document.getElementById('problem-section').style.display = 'none';
+  document.getElementById('input-area').style.display = 'flex';
+
+  whyChain = [{ type: 'problem', text: problem }];
+  renderChain();
+
+  const initial = `I want to investigate this operational problem using the 5 Whys method:\n\n"${problem}"`;
+  addMessage('user', initial);
+
+  await callClaude(initial);
+}
+
+async function sendMessage() {
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  if (!text || analysisComplete) return;
+  input.value = '';
+  addMessage('user', text);
+  await callClaude(text);
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function exportChain() {
+  let text = 'TAQA LEAD — 5 Whys Root Cause Chain\n';
+  text += '='.repeat(40) + '\n\n';
+  whyChain.forEach(item => {
+    if (item.type === 'problem') text += `PROBLEM:\n${item.text}\n\n`;
+    else if (item.type === 'why') text += `WHY ${item.num}:\n${item.answer}\n\n`;
+    else if (item.type === 'rootcause') text += `ROOT CAUSE:\n${item.text}\n`;
+  });
+  const blob = new Blob([text], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = '5whys-analysis.txt';
+  a.click();
+}
+
+function restart() {
+  messages = []; whyChain = []; analysisComplete = false; problem = '';
+  document.getElementById('messages').innerHTML = '';
+  document.getElementById('problem-input').value = '';
+  document.getElementById('problem-section').style.display = 'block';
+  document.getElementById('input-area').style.display = 'none';
+  document.getElementById('send-btn').disabled = false;
+  document.getElementById('export-btn').style.display = 'none';
+  renderChain();
+}
+
+function dismissBriefing(){
+  var el = document.getElementById('briefing-overlay');
+  if(el){ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(function(){el.classList.add('hidden');},300); }
+}
+
 </script>
 </body>
 </html>

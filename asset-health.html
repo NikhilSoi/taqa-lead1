@@ -12,15 +12,24 @@ header{background:var(--dark);padding:14px 20px;display:flex;align-items:center;
 .badge{background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.06em;}
 header h1{color:#fff;font-size:17px;font-weight:600;flex:1;}
 .header-tag{color:#aaa;font-size:12px;}
+
+
+
+
+
 .container{max-width:880px;margin:0 auto;padding:28px 20px;}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
 @media(max-width:640px){.grid{grid-template-columns:1fr;}}
+
+/* Asset info card */
 .card{background:#fff;border-radius:12px;border:1.5px solid var(--border);padding:24px;}
-.card-title{font-size:13px;font-weight:700;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;}
+.card-title{font-size:13px;font-weight:700;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:12px;font-weight:600;color:var(--light);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;}
-.field input,.field select{width:100%;padding:9px 12px;border-radius:7px;border:1.5px solid var(--border);font-size:14px;color:var(--dark);background:#fff;}
-.field input:focus,.field select:focus{outline:none;border-color:var(--teal);}
+.field input, .field select{width:100%;padding:9px 12px;border-radius:7px;border:1.5px solid var(--border);font-size:14px;color:var(--dark);background:#fff;}
+.field input:focus, .field select:focus{outline:none;border-color:var(--teal);}
+
+/* Sliders */
 .factor{margin-bottom:20px;}
 .factor-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
 .factor-name{font-size:14px;font-weight:600;color:var(--dark);}
@@ -29,6 +38,8 @@ header h1{color:#fff;font-size:17px;font-weight:600;flex:1;}
 input[type=range]{width:100%;-webkit-appearance:none;height:6px;border-radius:3px;background:var(--border);outline:none;cursor:pointer;}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--teal);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.2);}
 .range-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--light);margin-top:4px;}
+
+/* Score display */
 .score-card{background:#fff;border-radius:12px;border:1.5px solid var(--border);padding:24px;grid-column:1/-1;}
 .score-display{display:flex;align-items:center;gap:24px;margin-bottom:20px;}
 .score-circle{width:90px;height:90px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;border:4px solid;}
@@ -38,12 +49,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .score-label{font-size:22px;font-weight:700;margin-bottom:6px;}
 .score-sub{font-size:14px;color:var(--light);line-height:1.5;}
 .action-badge{display:inline-block;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;margin-top:8px;}
+
+/* Score meter */
 .meter{height:12px;border-radius:6px;background:var(--border);overflow:hidden;margin-bottom:20px;}
 .meter-fill{height:100%;border-radius:6px;transition:width .4s ease,background .4s ease;}
+
+/* Factor breakdown */
 .breakdown{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px;}
 .breakdown-item{text-align:center;padding:10px 6px;border-radius:8px;border:1.5px solid var(--border);background:var(--grey);}
 .breakdown-num{font-size:18px;font-weight:700;}
 .breakdown-name{font-size:10px;color:var(--light);margin-top:4px;line-height:1.3;}
+
+/* AI recommendation */
 .ai-section{border-top:2px solid var(--border);padding-top:20px;margin-top:4px;}
 .ai-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
 .ai-header h3{font-size:14px;font-weight:700;color:var(--dark);}
@@ -55,117 +72,265 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 .ai-response.loading{display:flex;align-items:center;gap:10px;color:var(--teal);}
 .spinner{width:18px;height:18px;border:2px solid var(--teal-lt);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg);}}
+
 footer{text-align:center;padding:20px;font-size:11px;color:var(--light);}
 footer a{color:var(--teal);text-decoration:none;}
+
+/* ── BRIEFING OVERLAY ──────────────────────────────────────────────── */
+#briefing-overlay{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#00093F 0%,#0D1F5A 60%,#001830 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;}
+#briefing-overlay.hidden{display:none;}
+.br-badge{background:#FF5F00;color:#fff;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:16px;}
+.br-session{color:#AAAAAA;font-size:13px;margin-bottom:6px;letter-spacing:.06em;}
+.br-title{color:#fff;font-size:26px;font-weight:700;line-height:1.25;margin-bottom:14px;max-width:620px;}
+.br-box{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:14px 22px;max-width:560px;margin-bottom:18px;}
+.br-box-label{color:#FF5F00;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px;}
+.br-box-text{color:#DDDDDD;font-size:14px;line-height:1.6;}
+.br-box-text strong{color:#fff;}
+.br-steps{max-width:520px;margin-bottom:24px;text-align:left;}
+.br-step{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;}
+.br-num{background:#FF5F00;color:#fff;font-size:11px;font-weight:700;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.br-text{color:#CCCCCC;font-size:13.5px;line-height:1.5;}
+.br-text strong{color:#fff;}
+.br-btn{background:#FF5F00;color:#fff;border:none;font-size:15px;font-weight:700;padding:13px 38px;border-radius:8px;cursor:pointer;letter-spacing:.04em;transition:background .2s;}
+.br-btn:hover{background:#D94E00;}
+.br-footer{color:#555;font-size:11px;margin-top:12px;}
+
 </style>
 </head>
 <body>
+
+<div id="briefing-overlay">
+  <div class="br-badge">DIGITAL SIMULATION</div>
+  <div class="br-session">SESSION D2·04  ·  Asset Lifecycle Management</div>
+  <div class="br-title">Asset Health Simulator</div>
+  <div class="br-box">
+    <div class="br-box-label">THE CONCEPT: ASSET HEALTH SCORING</div>
+    <div class="br-box-text">Every asset you manage has a health status based on five factors. This tool scores your asset and recommends a management action — <strong>Monitor, Escalate, or Flag for Lifecycle Decision</strong> — using the same logic as ISO 55001.</div>
+  </div>
+  <div class="br-steps"><div class="br-step"><div class="br-num">1</div><div class="br-text">Think of a <strong>real asset you manage</strong> — a transformer, switchboard, or feeder line.</div></div>
+<div class="br-step"><div class="br-num">2</div><div class="br-text">Score it honestly on the <strong>5 health factors</strong> (1 = low concern, 5 = critical).</div></div>
+<div class="br-step"><div class="br-num">3</div><div class="br-text">Click <strong>Generate Recommendation</strong> to get an AI-driven maintenance action.</div></div>
+<div class="br-step"><div class="br-num">4</div><div class="br-text">Ask yourself: <strong>does this match your instinct — and if not, why?</strong></div></div></div>
+  <button class="br-btn" onclick="dismissBriefing()">Start the Simulation &rarr;</button>
+  <div class="br-footer">taqa-lead1.vercel.app  ·  TAQA LEAD Module 2</div>
+</div>
 <header>
   <span class="badge">T5</span>
   <h1>Asset Health Simulator</h1>
   <span class="header-tag">TAQA LEAD · Module 2</span>
 </header>
+
 <div class="container">
+
   <div class="grid">
+    <!-- Asset Info -->
     <div class="card">
       <div class="card-title">📋 Asset Details</div>
-      <div class="field"><label>Asset Name / ID</label><input type="text" id="asset-name" placeholder="e.g. Transformer T-047" oninput="update()"></div>
-      <div class="field"><label>Asset Type</label><select id="asset-type" onchange="update()">
-        <option value="">Select type…</option>
-        <option>Power Transformer</option><option>Overhead Line Section</option>
-        <option>Substation Switchgear</option><option>Underground Cable</option>
-        <option>Pumping Station Motor</option><option>Water Pipeline Section</option>
-        <option>Protection Relay System</option><option>HV Circuit Breaker</option><option>Other</option>
-      </select></div>
-      <div class="field"><label>Your Name / Team</label><input type="text" id="assessor" placeholder="e.g. Ahmed Al-Mansoori" oninput="update()"></div>
+      <div class="field">
+        <label>Asset Name / ID</label>
+        <input type="text" id="asset-name" placeholder="e.g. Transformer T-047 / Substation 12" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Asset Type</label>
+        <select id="asset-type" onchange="update()">
+          <option value="">Select type…</option>
+          <option>Power Transformer</option>
+          <option>Overhead Line Section</option>
+          <option>Substation Switchgear</option>
+          <option>Underground Cable</option>
+          <option>Pumping Station Motor</option>
+          <option>Water Pipeline Section</option>
+          <option>Protection Relay System</option>
+          <option>HV Circuit Breaker</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Your Name / Team</label>
+        <input type="text" id="assessor" placeholder="e.g. Ahmed Al-Mansoori · Substation Team B" oninput="update()">
+      </div>
     </div>
+
+    <!-- Factors -->
     <div class="card">
       <div class="card-title">⚙️ Health Factors — Score each 1 to 5</div>
       <div id="factors-container"></div>
     </div>
   </div>
+
+  <!-- Score card (full width) -->
   <div style="margin-top:20px;">
     <div class="score-card">
       <div class="score-display">
-        <div class="score-circle" id="score-circle"><span class="score-num" id="score-num">0</span><span class="score-max">/25</span></div>
+        <div class="score-circle" id="score-circle">
+          <span class="score-num" id="score-num">0</span>
+          <span class="score-max">/25</span>
+        </div>
         <div class="score-info">
           <div class="score-label" id="score-label">Score your asset to begin</div>
-          <div class="score-sub" id="score-sub">Adjust the five factors to generate your assessment.</div>
+          <div class="score-sub" id="score-sub">Adjust the five factors on the left to generate your assessment.</div>
           <div id="action-badge"></div>
         </div>
       </div>
       <div class="meter"><div class="meter-fill" id="meter-fill" style="width:0%;background:var(--teal)"></div></div>
       <div class="breakdown" id="breakdown"></div>
+
       <div class="ai-section">
-        <div class="ai-header"><h3>AI Recommendation</h3><span class="ai-badge">Powered by Claude</span></div>
-        <button class="analyse-btn" id="analyse-btn" onclick="getRecommendation()">🤖 Generate Recommendation</button>
+        <div class="ai-header">
+          <h3>AI Recommendation</h3>
+          <span class="ai-badge">Powered by Claude</span>
+        </div>
+        <button class="analyse-btn" id="analyse-btn" onclick="getRecommendation()">
+          <span>🤖</span> Generate Recommendation
+        </button>
         <div id="ai-response"></div>
       </div>
     </div>
   </div>
+
 </div>
 <footer>TAQA LEAD Programme · Module 2 · Built by <a href="#">VectorEd</a></footer>
+
 <script>
-const FACTORS=[
-  {id:'age',name:'Age Relative to Design Life',desc:'How far through the expected life is this asset?',labels:['Within life','','Mid-life','','Near/past end']},
-  {id:'faults',name:'Fault History (Last 12 Months)',desc:'How many unplanned faults has this asset had?',labels:['Zero faults','','2-3 faults','','4+ or critical']},
-  {id:'cost',name:'Maintenance Cost Trend (3 Years)',desc:'Is the cost to maintain this asset increasing?',labels:['Flat/declining','','Moderate rise','','Significant rise']},
-  {id:'monitoring',name:'Condition Monitoring Coverage',desc:'How well is this asset monitored?',labels:['Full monitoring','','Partial','','No monitoring']},
-  {id:'criticality',name:'Criticality to Network',desc:'What is the impact if this asset fails?',labels:['Low/redundancy','','Medium','','High/single point']},
+const API_ENDPOINT = '/api/chat';
+
+
+const FACTORS = [
+  {
+    id:'age', name:'Age Relative to Design Life',
+    desc:'How far through the expected operating life is this asset?',
+    labels:['Well within life','','Mid-life range','','Near/past design life'],
+  },
+  {
+    id:'faults', name:'Fault History — Last 12 Months',
+    desc:'How many unplanned faults or incidents has this asset had?',
+    labels:['Zero faults','','2–3 faults','','4+ or one critical failure'],
+  },
+  {
+    id:'cost', name:'Maintenance Cost Trend — 3 Years',
+    desc:'Is the cost to maintain this asset increasing?',
+    labels:['Flat/declining','','Moderate increase','','Significant/accelerating'],
+  },
+  {
+    id:'monitoring', name:'Condition Monitoring Coverage',
+    desc:'How well is this asset\'s health being monitored?',
+    labels:['Full monitoring','','Partial coverage','','No monitoring'],
+  },
+  {
+    id:'criticality', name:'Criticality to Network Reliability',
+    desc:'What is the impact if this asset fails?',
+    labels:['Low — redundancy','','Medium — delayed','','High — single point of failure'],
+  },
 ];
-const scores={age:1,faults:1,cost:1,monitoring:1,criticality:1};
-function renderFactors(){
-  document.getElementById('factors-container').innerHTML=FACTORS.map(f=>`
+
+const scores = { age:1, faults:1, cost:1, monitoring:1, criticality:1 };
+
+function renderFactors() {
+  const c = document.getElementById('factors-container');
+  c.innerHTML = FACTORS.map(f => `
     <div class="factor">
-      <div class="factor-header"><span class="factor-name">${f.name}</span><span class="factor-score" id="score-${f.id}">1</span></div>
+      <div class="factor-header">
+        <span class="factor-name">${f.name}</span>
+        <span class="factor-score" id="score-${f.id}">1</span>
+      </div>
       <div class="factor-desc">${f.desc}</div>
       <input type="range" min="1" max="5" value="1" id="range-${f.id}" oninput="scoreChange('${f.id}',this.value)">
-      <div class="range-labels">${f.labels.map(l=>`<span>${l}</span>`).join('')}</div>
-    </div>`).join('');
+      <div class="range-labels">
+        ${f.labels.map(l=>`<span>${l}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
 }
-function scoreChange(id,val){scores[id]=parseInt(val);document.getElementById(`score-${id}`).textContent=val;update();}
-function getCategory(total){
-  if(total<=10)return{label:'Monitor Routinely',sub:'Asset is in acceptable condition. Continue scheduled maintenance.',color:'var(--green)',badge:'#1A7A5E',badgeBg:'var(--green-lt)'};
-  if(total<=18)return{label:'Escalate for Review',sub:'Elevated risk. Flag to engineering team for assessment within 30 days.',color:'var(--orange)',badge:'var(--orange)',badgeBg:'var(--orange-lt)'};
-  return{label:'Flag for Lifecycle Decision',sub:'Multiple high-risk factors. Escalate to asset management team immediately.',color:'var(--red)',badge:'var(--red)',badgeBg:'var(--red-lt)'};
+
+function scoreChange(id, val) {
+  scores[id] = parseInt(val);
+  document.getElementById(`score-${id}`).textContent = val;
+  update();
 }
-function update(){
-  const total=Object.values(scores).reduce((a,b)=>a+b,0);
-  const cat=getCategory(total);
-  const pct=(total/25)*100;
-  document.getElementById('score-num').textContent=total;
-  document.getElementById('score-label').textContent=cat.label;
-  document.getElementById('score-sub').textContent=cat.sub;
-  const circle=document.getElementById('score-circle');
-  circle.style.borderColor=cat.color;
-  circle.querySelector('.score-num').style.color=cat.color;
-  document.getElementById('meter-fill').style.width=pct+'%';
-  document.getElementById('meter-fill').style.background=cat.color;
-  document.getElementById('action-badge').innerHTML=`<span class="action-badge" style="background:${cat.badgeBg};color:${cat.badge};border:1.5px solid ${cat.badge}">${cat.label}</span>`;
-  document.getElementById('breakdown').innerHTML=FACTORS.map(f=>{const s=scores[f.id];const c=s<=2?'var(--green)':s===3?'var(--orange)':'var(--red)';return`<div class="breakdown-item"><div class="breakdown-num" style="color:${c}">${s}</div><div class="breakdown-name">${f.name.split(' ').slice(0,2).join(' ')}</div></div>`;}).join('');
-  document.getElementById('ai-response').innerHTML='';
+
+function getCategory(total) {
+  if (total <= 10) return { label:'Monitor Routinely', sub:'Asset is in acceptable condition. Continue scheduled maintenance and monitoring.', color:'var(--green)', fill:'var(--green-lt)', badge:'#1A7A5E', badgeBg:'var(--green-lt)' };
+  if (total <= 18) return { label:'Escalate for Review', sub:'Elevated risk indicators. Flag to your engineering team for condition assessment within 30 days.', color:'var(--orange)', fill:'var(--orange-lt)', badge:'var(--orange)', badgeBg:'var(--orange-lt)' };
+  return { label:'Flag for Lifecycle Decision', sub:'Multiple high-risk factors. Escalate to asset management team immediately — this asset needs a replace or rehabilitate decision.', color:'var(--red)', fill:'var(--red-lt)', badge:'var(--red)', badgeBg:'var(--red-lt)' };
 }
-async function getRecommendation(){
-  const name=document.getElementById('asset-name').value||'Unspecified asset';
-  const type=document.getElementById('asset-type').value||'transmission asset';
-  const total=Object.values(scores).reduce((a,b)=>a+b,0);
-  const cat=getCategory(total);
-  const btn=document.getElementById('analyse-btn');
-  btn.disabled=true;
-  document.getElementById('ai-response').innerHTML='<div class="ai-response loading"><div class="spinner"></div>Generating recommendation…</div>';
-  const prompt=`Asset assessment for TAQA Transmission: ${name} (${type}). Overall score: ${total}/25 - ${cat.label}. Factor scores (1=low concern, 5=high): Age:${scores.age}, Fault history:${scores.faults}, Cost trend:${scores.cost}, Condition monitoring:${scores.monitoring}, Criticality:${scores.criticality}. Provide a practical 4-5 sentence recommendation for a first-time manager. Include what the highest scores suggest, what the main risk is, and one specific action this week. Be direct and operational.`;
-  try{
-    const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:prompt}]})});
-    const data=await res.json();
-    if(data.error)throw new Error(data.error.message);
-    document.getElementById('ai-response').innerHTML=`<div class="ai-response">${data.content[0].text.replace(/\n/g,'<br>')}</div>`;
-  }catch(e){
-    document.getElementById('ai-response').innerHTML=`<div class="ai-response" style="background:var(--red-lt);border-color:var(--red);color:var(--red)">Error: ${e.message}</div>`;
+
+function update() {
+  const total = Object.values(scores).reduce((a,b)=>a+b,0);
+  const cat = getCategory(total);
+  const pct = (total/25)*100;
+
+  document.getElementById('score-num').textContent = total;
+  document.getElementById('score-label').textContent = cat.label;
+  document.getElementById('score-sub').textContent = cat.sub;
+
+  const circle = document.getElementById('score-circle');
+  circle.style.borderColor = cat.color;
+  circle.querySelector('.score-num').style.color = cat.color;
+
+  document.getElementById('meter-fill').style.width = pct + '%';
+  document.getElementById('meter-fill').style.background = cat.color;
+
+  const badge = document.getElementById('action-badge');
+  badge.innerHTML = `<span class="action-badge" style="background:${cat.badgeBg};color:${cat.badge};border:1.5px solid ${cat.badge}">${cat.label}</span>`;
+
+  const bd = document.getElementById('breakdown');
+  bd.innerHTML = FACTORS.map(f => {
+    const s = scores[f.id];
+    const c = s<=2?'var(--green)':s===3?'var(--orange)':'var(--red)';
+    return `<div class="breakdown-item"><div class="breakdown-num" style="color:${c}">${s}</div><div class="breakdown-name">${f.name.split(' ').slice(0,2).join(' ')}</div></div>`;
+  }).join('');
+
+  document.getElementById('ai-response').innerHTML = '';
+}
+
+async function getRecommendation() {
+
+  const name = document.getElementById('asset-name').value || 'Unspecified asset';
+  const type = document.getElementById('asset-type').value || 'transmission asset';
+  const total = Object.values(scores).reduce((a,b)=>a+b,0);
+  const cat = getCategory(total);
+
+  const btn = document.getElementById('analyse-btn');
+  btn.disabled = true;
+  document.getElementById('ai-response').innerHTML = '<div class="ai-response loading"><div class="spinner"></div>Generating recommendation…</div>';
+
+  const prompt = `Asset assessment for a TAQA Transmission manager:
+
+Asset: ${name} (${type})
+Overall score: ${total}/25 — ${cat.label}
+
+Factor scores (1=low concern, 5=high concern):
+- Age relative to design life: ${scores.age}/5
+- Fault history last 12 months: ${scores.faults}/5
+- Maintenance cost trend 3 years: ${scores.cost}/5
+- Condition monitoring coverage: ${scores.monitoring}/5
+- Criticality to network reliability: ${scores.criticality}/5
+
+Provide a practical recommendation in 4–5 sentences for a first-time manager at TAQA Transmission. Include: what the highest-scoring factors suggest about the asset's health, what the most important risk is, and one specific action the manager should take this week. Be direct and operational — no jargon.`;
+
+  try {
+    const res = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:400, messages:[{role:'user',content:prompt}] })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    document.getElementById('ai-response').innerHTML = `<div class="ai-response">${data.content[0].text.replace(/\n/g,'<br>')}</div>`;
+  } catch(e) {
+    document.getElementById('ai-response').innerHTML = `<div class="ai-response" style="background:var(--red-lt);border-color:var(--red);color:var(--red)">Error: ${e.message}</div>`;
   }
-  btn.disabled=false;
+  btn.disabled = false;
 }
+
 renderFactors();
 update();
+
+function dismissBriefing(){
+  var el = document.getElementById('briefing-overlay');
+  if(el){ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(function(){el.classList.add('hidden');},300); }
+}
+
 </script>
 </body>
 </html>

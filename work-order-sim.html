@@ -59,9 +59,13 @@ header h1{color:#fff;font-size:17px;font-weight:600;flex:1;}
 .btn-danger:hover{background:var(--red);color:#fff;}
 .btn-secondary{background:var(--grey);border-color:var(--border);color:var(--mid);}
 .btn-secondary:hover{background:var(--dark);color:#fff;border-color:var(--dark);}
+.btn-pause{background:var(--dark);border-color:var(--dark);color:#fff;min-width:108px;}
+.btn-pause:hover{background:#000;}
+.btn-pause.paused{background:var(--orange);border-color:var(--orange);color:#fff;}
+.btn-pause.paused:hover{background:#cf6a16;}
 .btn:disabled{opacity:.4;cursor:not-allowed;}
 .speed-row{display:flex;align-items:center;gap:6px;}
-.speed-btn{width:34px;height:28px;border-radius:5px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:12px;font-weight:700;color:var(--mid);}
+.speed-btn{width:40px;height:28px;border-radius:5px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:12px;font-weight:700;color:var(--mid);}
 .speed-btn.active{background:var(--dark);color:#fff;border-color:var(--dark);}
 
 /* Log */
@@ -73,8 +77,10 @@ header h1{color:#fff;font-size:17px;font-weight:600;flex:1;}
 .log-entry.disrupt{color:var(--orange);}
 
 /* Little's law overlay */
-.littles-badge{background:var(--teal-xl);border:1.5px solid var(--teal-lt);border-radius:8px;padding:10px 16px;margin:0 16px 8px;font-size:13px;color:var(--teal);display:flex;align-items:center;gap:10px;}
+.littles-badge{background:var(--teal-xl);border:1.5px solid var(--teal-lt);border-radius:8px;padding:10px 16px;margin:0 16px 8px;font-size:13px;color:var(--teal);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
 .littles-badge strong{font-size:15px;}
+.pause-flag{display:none;background:var(--orange);color:#fff;font-size:11px;font-weight:700;letter-spacing:.06em;padding:2px 10px;border-radius:20px;margin-left:auto;}
+.pause-flag.show{display:inline-block;}
 
 footer{text-align:center;padding:12px;font-size:11px;color:var(--light);}
 footer a{color:var(--teal);text-decoration:none;}
@@ -116,8 +122,8 @@ footer a{color:var(--teal);text-decoration:none;}
     <div class="br-box-text"><strong>Lead Time = WIP ÷ Throughput</strong><br>If your team has 1,000 open jobs and closes 200/week, lead time = 5 weeks. To reach 2 weeks, WIP must fall to 400 — not by working faster, but by fixing the constraint.</div>
   </div>
   <div class="br-steps"><div class="br-step"><div class="br-num">1</div><div class="br-text">Click <strong>Add Fault</strong> to log new jobs. Watch WIP and lead time update live.</div></div>
-<div class="br-step"><div class="br-num">2</div><div class="br-text">Click <strong>Advance</strong> to move jobs through the 5 pipeline stages.</div></div>
-<div class="br-step"><div class="br-num">3</div><div class="br-text">Click <strong>Trigger Disruption</strong> — see what a Priority Jump or Parts Rejection does to lead time.</div></div>
+<div class="br-step"><div class="br-num">2</div><div class="br-text">Jobs move through the 5 stages <strong>automatically on the clock</strong>. Hit <strong>Pause</strong> to freeze the board and read it; use <strong>Speed</strong> (0.5×–5×) to slow it right down or speed it up.</div></div>
+<div class="br-step"><div class="br-num">3</div><div class="br-text">Click a <strong>Disruption</strong> (Priority Jump, Parts Rejected, Engineer Reassigned) — see what it does to lead time.</div></div>
 <div class="br-step"><div class="br-num">4</div><div class="br-text">Ask yourself: <strong>which stage is creating the bottleneck?</strong></div></div></div>
   <button class="br-btn" onclick="dismissBriefing()">Start the Simulation &rarr;</button>
   <div class="br-footer">taqa-lead1.vercel.app  ·  TAQA LEAD Module 2</div>
@@ -139,11 +145,16 @@ footer a{color:var(--teal);text-decoration:none;}
   <span>📐 Little's Law:</span>
   <strong>Lead Time = WIP ÷ Throughput</strong>
   <span style="color:var(--light);font-size:12px;margin-left:4px;">· Watch this update live as jobs build up</span>
+  <span class="pause-flag" id="pause-flag">⏸ PAUSED</span>
 </div>
 
 <div class="board" id="board"></div>
 
 <div class="controls">
+  <div class="ctrl-group">
+    <span class="ctrl-label">Flow:</span>
+    <button class="btn btn-pause" id="pauseBtn" onclick="togglePause()">⏸ Pause</button>
+  </div>
   <div class="ctrl-group">
     <span class="ctrl-label">Add jobs:</span>
     <button class="btn btn-primary" onclick="addJob(false)">+ Add Fault</button>
@@ -158,6 +169,7 @@ footer a{color:var(--teal);text-decoration:none;}
   <div class="ctrl-group" style="margin-left:auto;">
     <span class="ctrl-label">Speed:</span>
     <div class="speed-row">
+      <button class="speed-btn" id="sp05" onclick="setSpeed(0.5,this)">0.5×</button>
       <button class="speed-btn active" id="sp1" onclick="setSpeed(1,this)">1×</button>
       <button class="speed-btn" id="sp2" onclick="setSpeed(2,this)">2×</button>
       <button class="speed-btn" id="sp5" onclick="setSpeed(5,this)">5×</button>
@@ -192,8 +204,10 @@ let nextId = 1;
 let ticker = null;
 let simTime = 0;
 let speed = 1;
+let paused = false;
 let engineerDown = false;
-let completedInWindow = [];
+let engineerDownUntil = -1;   // sim-time based, so it respects pause + speed
+const WINDOW = 60;            // throughput rolling window, in SIM seconds
 
 function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
 function randFault(){ return FAULT_TYPES[Math.floor(Math.random()*FAULT_TYPES.length)]; }
@@ -244,15 +258,19 @@ function disruptParts() {
 
 function disruptEngineer() {
   engineerDown = true;
-  setTimeout(()=>{ engineerDown=false; log('Engineer returned to normal operations','event'); }, 20000/speed);
-  log(`DISRUPTION: Engineer reassigned — stage 4 temporarily blocked`,'disrupt');
+  engineerDownUntil = simTime + 20;   // restored after 20 sim-seconds (see tick)
+  log(`DISRUPTION: Engineer reassigned — stage 4 blocked for ~20s of sim time`,'disrupt');
   render();
 }
 
 function tick() {
   simTime++;
-  const now = Date.now()/1000;
-  completedInWindow = completedInWindow.filter(t => now-t < 60);
+
+  // Engineer auto-restore on sim-time, so pause/speed don't distort it
+  if (engineerDown && simTime >= engineerDownUntil) {
+    engineerDown = false;
+    log('Engineer returned to normal operations','event');
+  }
 
   jobs.forEach(job => {
     if (job.held) {
@@ -271,7 +289,6 @@ function tick() {
       }
       if (job.stage === 6) {
         completed.push({ ...job, completedAt: simTime });
-        completedInWindow.push(now);
         log(`✓ ${job.id} completed — ${fmtTime(simTime-job.created)} total lead time`,'complete');
       }
     }
@@ -283,11 +300,14 @@ function tick() {
 
 function updateStats() {
   const wip = jobs.filter(j=>j.stage>=1&&j.stage<=4).length;
-  const throughput = completedInWindow.length;
-  const lt = throughput > 0 ? (wip / (throughput/60)).toFixed(1) + 's' : (wip > 0 ? 'Building…' : '—');
+  // Throughput = jobs completed within the last WINDOW sim-seconds (a true rate)
+  const throughput = completed.filter(c => simTime - c.completedAt < WINDOW).length;
+  const lt = throughput > 0
+    ? (wip / (throughput / 60)).toFixed(1) + 's'
+    : (wip > 0 ? 'Building…' : '—');
   document.getElementById('stat-wip').textContent = wip;
-  document.getElementById('stat-throughput').textContent = (throughput/1).toFixed(1);
-  document.getElementById('stat-leadtime').textContent = typeof lt==='string'&&lt.includes('s') ? lt : lt;
+  document.getElementById('stat-throughput').textContent = throughput.toFixed(1);
+  document.getElementById('stat-leadtime').textContent = lt;
   document.getElementById('stat-done').textContent = completed.length;
 }
 
@@ -324,25 +344,54 @@ function log(msg, type='event') {
   if (panel.children.length > 50) panel.removeChild(panel.lastChild);
 }
 
+function startTicker() {
+  clearInterval(ticker);
+  if (!paused) ticker = setInterval(tick, 1000/speed);
+}
+
 function setSpeed(s, btn) {
   speed = s;
   document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  clearInterval(ticker);
-  ticker = setInterval(tick, 1000/speed);
+  startTicker();           // honours pause: won't restart the clock if frozen
+}
+
+function togglePause() {
+  paused = !paused;
+  const btn = document.getElementById('pauseBtn');
+  const flag = document.getElementById('pause-flag');
+  if (paused) {
+    clearInterval(ticker);
+    btn.textContent = '▶ Resume';
+    btn.classList.add('paused');
+    flag.classList.add('show');
+    log('Simulation paused — read the board, then Resume','event');
+  } else {
+    btn.textContent = '⏸ Pause';
+    btn.classList.remove('paused');
+    flag.classList.remove('show');
+    log('Simulation resumed','event');
+    startTicker();
+  }
 }
 
 function resetSim() {
-  jobs=[]; completed=[]; nextId=1; simTime=0; engineerDown=false; completedInWindow=[];
+  jobs=[]; completed=[]; nextId=1; simTime=0;
+  engineerDown=false; engineerDownUntil=-1;
+  paused=false;
+  const btn=document.getElementById('pauseBtn');
+  btn.textContent='⏸ Pause'; btn.classList.remove('paused');
+  document.getElementById('pause-flag').classList.remove('show');
   document.getElementById('log').innerHTML='';
   render();
   log('Simulation reset — ready to start','event');
+  startTicker();
 }
 
 // Init
 render();
 log('Simulation ready. Click "Add Fault" to begin.','event');
-ticker = setInterval(tick, 1000);
+startTicker();
 
 // Auto-add some initial jobs after a moment
 setTimeout(()=>{ addJob(); addJob(); addJob(); }, 500);

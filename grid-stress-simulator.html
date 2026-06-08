@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grid Stress Simulator · TAQA Transmission LEAD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{background:#070b12;color:#e2ecf6;font-family:'Rajdhani',system-ui,sans-serif;min-height:100vh;line-height:1.5}
+
+/* status colours */
+:root{--cs:#22c55e;--cw:#f59e0b;--ca:#f97316;--co:#ef4444}
+
+/* animations */
+@keyframes pf{to{stroke-dashoffset:-16}}
+@keyframes pr{0%,100%{opacity:.35}50%{opacity:.8}}
+
+/* nav */
+nav{background:#070b12;border-bottom:1px solid rgba(245,158,11,.18);padding:0 24px;height:48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-back{display:flex;align-items:center;gap:6px;color:#4d6a85;text-decoration:none;font-size:13px;font-weight:500;padding:4px 10px;border:1px solid rgba(255,255,255,.06);border-radius:5px;transition:color .15s,border-color .15s}
+.nav-back:hover{color:#e2ecf6;border-color:rgba(255,255,255,.12)}
+.nav-title{font-size:13px;font-weight:700;color:#f59e0b;letter-spacing:.08em;text-transform:uppercase;margin-left:14px}
+.nav-right{font-family:'Share Tech Mono',monospace;font-size:11px;color:#2d4a6a;letter-spacing:.1em}
+
+/* page header */
+.phdr{padding:18px 24px 14px;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.phdr h1{font-size:19px;font-weight:700;color:#e2ecf6;letter-spacing:.03em}
+.phdr p{font-size:11px;color:#3d5a7a;font-family:'Share Tech Mono',monospace;letter-spacing:.1em;margin-top:2px}
+.hdr-load{text-align:right}
+.hdr-mw{font-family:'Share Tech Mono',monospace;font-size:28px;font-weight:400;line-height:1.1;transition:color .35s}
+.hdr-unit{font-size:13px;color:#3d5a7a;margin-left:3px}
+.zone-badge{display:inline-flex;align-items:center;padding:5px 14px;border-radius:20px;border:1px solid;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.07em;transition:all .35s;white-space:nowrap}
+
+/* layout */
+main{max-width:1300px;margin:0 auto;padding:16px 24px 32px}
+.panel{background:#0f1824;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:16px}
+.slbl{display:block;font-size:10px;font-weight:700;color:#2d4a6a;letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px}
+
+/* diagram */
+.svg-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.04)}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:11px;color:#3d5a7a}
+.leg-sw{width:20px;height:2px;border-radius:1px}
+
+/* 3-col controls */
+.cgrid{display:grid;grid-template-columns:240px 1fr 265px;gap:14px;margin-bottom:14px}
+@media(max-width:900px){.cgrid{grid-template-columns:1fr}}
+.lcol{display:flex;flex-direction:column;gap:12px}
+
+/* slider */
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;background:linear-gradient(to right,#22c55e,#f59e0b 50%,#ef4444);border-radius:3px;outline:none;cursor:pointer;margin-bottom:8px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#f59e0b;box-shadow:0 0 10px rgba(245,158,11,.45);border:2px solid #070b12;cursor:pointer;margin-top:-7px}
+input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:3px}
+
+/* presets */
+.presets{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.pb{padding:4px 9px;border:1px solid rgba(255,255,255,.07);border-radius:4px;background:transparent;font-family:'Share Tech Mono',monospace;font-size:11px;color:#3d5a7a;cursor:pointer;transition:all .15s}
+.pb:hover,.pb.active{background:rgba(59,130,246,.14);border-color:rgba(59,130,246,.38);color:#93c5fd}
+
+/* scale box */
+.sbox{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);border-radius:5px;padding:8px 10px}
+.sbox-lbl{font-size:10px;color:#2d4a6a;margin-bottom:3px}
+.sbox-val{font-size:12px;font-weight:600;color:#6b84a0}
+
+/* gen bars */
+.gbrow{margin-bottom:10px}
+.gb-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.gb-name{font-size:11px;color:#4d6a85}
+.gb-val{font-family:'Share Tech Mono',monospace;font-size:12px}
+.gb-track{height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
+.gb-fill{height:100%;border-radius:3px;transition:width .4s ease}
+
+/* fault buttons */
+.fb{display:flex;align-items:center;gap:8px;width:100%;padding:9px 12px;border:1px solid rgba(255,255,255,.07);border-radius:5px;background:transparent;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:600;color:#4d6a85;text-align:left;transition:all .15s;letter-spacing:.04em;margin-bottom:8px}
+.fb:hover{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.1)}
+.fb.active{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.3);color:#fca5a5}
+.fault-alert{display:none;padding:9px 11px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.22);border-radius:5px;font-size:11px;color:#fca5a5;line-height:1.5;font-family:'Share Tech Mono',monospace}
+
+/* metric rows */
+.mr{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.mr:last-child{border-bottom:none}
+.mr-lbl{font-size:11px;color:#3d5a7a}
+.mr-val{font-family:'Share Tech Mono',monospace;font-size:13px;transition:color .3s}
+
+/* status card */
+.sc-total{font-family:'Share Tech Mono',monospace;font-size:22px;line-height:1.1;margin-bottom:4px;transition:color .35s}
+.sc-sub{font-size:11px;color:#3d5a7a;margin-bottom:12px}
+
+/* line meters */
+.lbrow{margin-bottom:10px}
+.lb-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
+.lb-name{font-size:11px;color:#4d6a85}
+.lb-val{font-family:'Share Tech Mono',monospace;font-size:12px;transition:color .3s}
+.lb-sub{font-size:10px;color:#2d4a6a;font-family:'Share Tech Mono',monospace;margin-bottom:4px}
+.lb-track{height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden}
+.lb-fill{height:100%;border-radius:2px;transition:width .4s ease,background .3s}
+
+/* insight */
+.insight{display:flex;gap:14px;align-items:flex-start;transition:border-color .4s}
+.ins-icon{width:38px;height:38px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:6px;border:1px solid;font-size:17px;transition:all .35s}
+.ins-zone{font-size:10px;font-weight:700;font-family:'Share Tech Mono',monospace;letter-spacing:.12em;margin-bottom:5px;transition:color .35s}
+.ins-text{font-size:13px;color:#8aa4be;line-height:1.65;font-weight:500}
+
+/* svg flow */
+.fl{stroke-dasharray:5 11;animation:pf var(--spd,2.5s) linear infinite;fill:none}
+.pr{animation:pr 1.6s ease-in-out infinite;fill:none}
+</style>
+</head>
+<body>
+
+<nav>
+  <div style="display:flex;align-items:center">
+    <a href="/" class="nav-back">← Hub</a>
+    <span class="nav-title">TAQA Transmission · LEAD Programme</span>
+  </div>
+  <div class="nav-right">MODULE 2 · OPERATIONAL EXCELLENCE</div>
+</nav>
+
+<div class="phdr">
+  <div>
+    <h1>Grid Absorption Stress Simulator</h1>
+    <p>SEE THE SYSTEM · 400kV TRANSMISSION · AL DHAFRA ZONE · SIMPLIFIED MODEL</p>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px">
+    <div class="hdr-load">
+      <div style="font-size:10px;color:#2d4a6a;font-family:'Share Tech Mono',monospace">AI LOAD</div>
+      <div class="hdr-mw" id="hdr-mw" style="color:#22c55e">0<span class="hdr-unit">MW</span></div>
+    </div>
+    <div class="zone-badge" id="zone-badge" style="border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.08);color:#22c55e">Zone 1 · Normal operation</div>
+  </div>
+</div>
+
+<main>
+
+<!-- SVG DIAGRAM -->
+<div class="panel" style="margin-bottom:14px">
+  <span class="slbl">400kV Transmission Network · Al Dhafra Zone</span>
+  <svg id="gsvg" viewBox="0 0 680 310" style="width:100%;display:block" role="img">
+    <title>TAQA Transmission Grid – Simplified Network Diagram</title>
+    <desc>Transmission network with Al Dhafra gen hub, two 400kV trunks, N-S interconnector, AI data centre loads and city load. Lines colour-coded by thermal loading percentage.</desc>
+    <defs>
+      <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </marker>
+    </defs>
+
+    <!-- shadow tracks -->
+    <line x1="340" y1="48" x2="118" y2="162" stroke="#040810" stroke-width="9"/>
+    <line x1="340" y1="48" x2="562" y2="162" stroke="#040810" stroke-width="9"/>
+    <line x1="118" y1="162" x2="562" y2="162" stroke="#040810" stroke-width="9"/>
+    <line x1="118" y1="162" x2="74"  y2="280" stroke="#040810" stroke-width="9"/>
+    <line x1="562" y1="162" x2="458" y2="280" stroke="#040810" stroke-width="9"/>
+    <line x1="562" y1="162" x2="624" y2="280" stroke="#040810" stroke-width="9"/>
+
+    <!-- base lines -->
+    <line id="bl-L1" x1="340" y1="48" x2="118" y2="162" stroke="#22c55e" stroke-width="2.5" opacity=".85"/>
+    <line id="bl-L2" x1="340" y1="48" x2="562" y2="162" stroke="#22c55e" stroke-width="2.5" opacity=".85"/>
+    <line id="bl-L3" x1="118" y1="162" x2="562" y2="162" stroke="#1e3a5f" stroke-width="1.5" opacity=".5"/>
+    <line id="bl-L4" x1="118" y1="162" x2="74"  y2="280" stroke="#22c55e" stroke-width="2"  opacity=".85"/>
+    <line id="bl-L5" x1="562" y1="162" x2="458" y2="280" stroke="#22c55e" stroke-width="2"  opacity=".85"/>
+    <line id="bl-L6" x1="562" y1="162" x2="624" y2="280" stroke="#334155" stroke-width="1.5" opacity=".7"/>
+
+    <!-- animated flow overlays -->
+    <line id="fl-L1" class="fl" x1="340" y1="48" x2="118" y2="162" stroke="#22c55e" stroke-width="1.5" style="--spd:2.5s;opacity:.6"/>
+    <line id="fl-L2" class="fl" x1="340" y1="48" x2="562" y2="162" stroke="#22c55e" stroke-width="1.5" style="--spd:2.5s;opacity:.6"/>
+    <line id="fl-L3" class="fl" x1="118" y1="162" x2="562" y2="162" stroke="#1e3a5f" stroke-width="1"   style="--spd:999s;opacity:0"/>
+    <line id="fl-L4" class="fl" x1="118" y1="162" x2="74"  y2="280" stroke="#22c55e" stroke-width="1.2" style="--spd:2.5s;opacity:.6"/>
+    <line id="fl-L5" class="fl" x1="562" y1="162" x2="458" y2="280" stroke="#22c55e" stroke-width="1.2" style="--spd:2.5s;opacity:.6"/>
+    <line id="fl-L6" class="fl" x1="562" y1="162" x2="624" y2="280" stroke="#334155" stroke-width="1"   style="--spd:4s;opacity:.35"/>
+
+    <!-- line labels -->
+    <g id="ll-L1"><rect x="196" y="88"  width="72" height="16" rx="3" fill="#050b14" opacity=".92"/><text x="232" y="100" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="11" fill="#22c55e">L1: 155MW</text></g>
+    <g id="ll-L2"><rect x="412" y="88"  width="72" height="16" rx="3" fill="#050b14" opacity=".92"/><text x="448" y="100" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="11" fill="#22c55e">L2: 155MW</text></g>
+    <g id="ll-L3"><rect x="300" y="147" width="60" height="16" rx="3" fill="#050b14" opacity=".92"/><text x="330" y="159" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="11" fill="#1e3a5f">L3: 0MW</text></g>
+    <g id="ll-L4"><rect x="60"  y="207" width="62" height="16" rx="3" fill="#050b14" opacity=".92"/><text x="91"  y="219" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="11" fill="#22c55e">L4: 0MW</text></g>
+    <g id="ll-L5"><rect x="482" y="207" width="62" height="16" rx="3" fill="#050b14" opacity=".92"/><text x="513" y="219" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="11" fill="#22c55e">L5: 0MW</text></g>
+    <g id="ll-L6"><rect x="566" y="207" width="62" height="16" rx="3" fill="#050b14" opacity=".92"/><text x="597" y="219" text-anchor="middle" font-family="'Share Tech Mono',monospace" font-size="11" fill="#334155">L6: 155MW</text></g>
+
+    <!-- fault markers (hidden by default) -->
+    <g id="fx-L1" style="display:none">
+      <circle cx="229" cy="105" r="11" fill="rgba(239,68,68,.14)" stroke="#ef4444" stroke-width="1.5"><animate attributeName="r" values="11;15;11" dur="1s" repeatCount="indefinite"/></circle>
+      <text x="229" y="110" text-anchor="middle" font-size="12" fill="#ef4444" font-weight="bold">✕</text>
+    </g>
+    <g id="fx-L2" style="display:none">
+      <circle cx="451" cy="105" r="11" fill="rgba(239,68,68,.14)" stroke="#ef4444" stroke-width="1.5"><animate attributeName="r" values="11;15;11" dur="1s" repeatCount="indefinite"/></circle>
+      <text x="451" y="110" text-anchor="middle" font-size="12" fill="#ef4444" font-weight="bold">✕</text>
+    </g>
+
+    <!-- AI pulse rings -->
+    <circle id="pr-A" class="pr" cx="74"  cy="280" r="22" stroke="#3b82f6" stroke-width="1" opacity="0"/>
+    <circle id="pr-B" class="pr" cx="458" cy="280" r="22" stroke="#3b82f6" stroke-width="1" opacity="0" style="animation-delay:.8s"/>
+
+    <!-- kV labels -->
+    <text x="232" y="110" text-anchor="middle" font-size="9" fill="#1e3a5f" font-family="'Share Tech Mono',monospace">400kV</text>
+    <text x="448" y="110" text-anchor="middle" font-size="9" fill="#1e3a5f" font-family="'Share Tech Mono',monospace">400kV</text>
+    <text x="340" y="177" text-anchor="middle" font-size="9" fill="#1e3a5f" font-family="'Share Tech Mono',monospace">400kV interconnector</text>
+    <text x="78"  y="243" text-anchor="middle" font-size="9" fill="#1e3a5f" font-family="'Share Tech Mono',monospace">132kV</text>
+    <text x="500" y="235" text-anchor="middle" font-size="9" fill="#1e3a5f" font-family="'Share Tech Mono',monospace">132kV</text>
+    <text x="604" y="235" text-anchor="middle" font-size="9" fill="#1e3a5f" font-family="'Share Tech Mono',monospace">132kV</text>
+
+    <!-- Generation Hub -->
+    <circle cx="340" cy="48" r="30" fill="#110c02" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="340" y="44" text-anchor="middle" font-size="10" fill="#f59e0b" font-family="'Rajdhani',sans-serif" font-weight="700" letter-spacing="0.04em">AL DHAFRA</text>
+    <text x="340" y="57" text-anchor="middle" font-size="9"  fill="#92400e" font-family="'Share Tech Mono',monospace">Gen Hub</text>
+
+    <!-- North Sub -->
+    <circle cx="118" cy="162" r="22" fill="#050e1f" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="118" y="158" text-anchor="middle" font-size="10" fill="#60a5fa" font-family="'Rajdhani',sans-serif" font-weight="700">NORTH</text>
+    <text x="118" y="170" text-anchor="middle" font-size="9"  fill="#1e3a8a" font-family="'Share Tech Mono',monospace">Sub</text>
+
+    <!-- South Sub -->
+    <circle cx="562" cy="162" r="22" fill="#050e1f" stroke="#3b82f6" stroke-width="1.5"/>
+    <text x="562" y="158" text-anchor="middle" font-size="10" fill="#60a5fa" font-family="'Rajdhani',sans-serif" font-weight="700">SOUTH</text>
+    <text x="562" y="170" text-anchor="middle" font-size="9"  fill="#1e3a8a" font-family="'Share Tech Mono',monospace">Sub</text>
+
+    <!-- AI Zone A -->
+    <circle cx="74"  cy="280" r="18" fill="#081526" stroke="#3b82f6" stroke-width="1"/>
+    <text x="74"  y="277" text-anchor="middle" font-size="10" fill="#60a5fa" font-family="'Rajdhani',sans-serif" font-weight="700">AI</text>
+    <text x="74"  y="288" text-anchor="middle" font-size="9"  fill="#1e3a8a" font-family="'Share Tech Mono',monospace">Zone A</text>
+
+    <!-- AI Zone B -->
+    <circle cx="458" cy="280" r="18" fill="#081526" stroke="#3b82f6" stroke-width="1"/>
+    <text x="458" y="277" text-anchor="middle" font-size="10" fill="#60a5fa" font-family="'Rajdhani',sans-serif" font-weight="700">AI</text>
+    <text x="458" y="288" text-anchor="middle" font-size="9"  fill="#1e3a8a" font-family="'Share Tech Mono',monospace">Zone B</text>
+
+    <!-- City Load -->
+    <circle cx="624" cy="280" r="16" fill="#080f18" stroke="#334155" stroke-width="1"/>
+    <text x="624" y="277" text-anchor="middle" font-size="9"  fill="#4d6a85" font-family="'Rajdhani',sans-serif" font-weight="600">CITY</text>
+    <text x="624" y="288" text-anchor="middle" font-size="8"  fill="#1e3a5f" font-family="'Share Tech Mono',monospace">310MW</text>
+  </svg>
+
+  <div class="svg-legend">
+    <div class="leg-item"><div class="leg-sw" style="background:#22c55e"></div>&lt;70% normal</div>
+    <div class="leg-item"><div class="leg-sw" style="background:#f59e0b"></div>70–85% warning</div>
+    <div class="leg-item"><div class="leg-sw" style="background:#f97316"></div>85–100% alert</div>
+    <div class="leg-item"><div class="leg-sw" style="background:#ef4444"></div>&gt;100% overload</div>
+    <div class="leg-item"><div class="leg-sw" style="background:#3d5a7a;opacity:.5"></div>tripped</div>
+  </div>
+</div>
+
+<!-- CONTROLS ROW -->
+<div class="cgrid">
+
+  <!-- LEFT: slider + gen + fault -->
+  <div class="lcol">
+
+    <div class="panel">
+      <span class="slbl">AI Data Centre Load</span>
+      <input type="range" id="ai-slider" min="0" max="1000" step="10" value="0" oninput="onSlider(this.value)">
+      <div class="presets">
+        <button class="pb active" onclick="setLoad(0)">0</button>
+        <button class="pb" onclick="setLoad(200)">200</button>
+        <button class="pb" onclick="setLoad(400)">400</button>
+        <button class="pb" onclick="setLoad(600)">600</button>
+        <button class="pb" onclick="setLoad(800)">800</button>
+        <button class="pb" onclick="setLoad(1000)">1000</button>
+      </div>
+      <div class="sbox">
+        <div class="sbox-lbl">SCALE REFERENCE</div>
+        <div id="scale-ref" class="sbox-val">0 MW — baseline city load only</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <span class="slbl">Generation Dispatch</span>
+      <div style="font-size:11px;color:#3d5a7a;margin-bottom:10px">
+        System demand: <span id="gen-total" style="font-family:'Share Tech Mono',monospace;color:#6b84a0">310</span> MW
+      </div>
+      <div class="gbrow">
+        <div class="gb-top"><span class="gb-name">Solar · Masdar 24/7</span><span id="gv-solar" class="gb-val" style="color:#f59e0b">84 MW</span></div>
+        <div class="gb-track"><div id="gb-solar" class="gb-fill" style="width:24%;background:#f59e0b"></div></div>
+      </div>
+      <div class="gbrow">
+        <div class="gb-top"><span class="gb-name">Battery storage</span><span id="gv-bess" class="gb-val" style="color:#818cf8">0 MW</span></div>
+        <div class="gb-track"><div id="gb-bess" class="gb-fill" style="width:0%;background:#818cf8"></div></div>
+      </div>
+      <div class="gbrow">
+        <div class="gb-top"><span class="gb-name">OCGT · Al Dhafra 1GW</span><span id="gv-ocgt" class="gb-val" style="color:#f97316">226 MW</span></div>
+        <div class="gb-track"><div id="gb-ocgt" class="gb-fill" style="width:23%;background:#f97316"></div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <span class="slbl">N-1 Fault Injection</span>
+      <p style="font-size:11px;color:#3d5a7a;margin-bottom:12px;line-height:1.55">Simulate a 400kV trunk trip. Observe how load redistributes and where overloads emerge.</p>
+      <button class="fb" id="fb-L2" onclick="toggleFault('L2')">⚡ Trip L2 · South 400kV trunk</button>
+      <button class="fb" id="fb-L1" onclick="toggleFault('L1')">⚡ Trip L1 · North 400kV trunk</button>
+      <div id="fault-alert" class="fault-alert"></div>
+    </div>
+
+  </div>
+
+  <!-- CENTRE: status + action -->
+  <div style="display:flex;flex-direction:column;gap:12px">
+
+    <div class="panel" id="status-card" style="border-color:rgba(34,197,94,.25)">
+      <span class="slbl">Grid Status</span>
+      <div class="sc-total" id="sc-total" style="color:#22c55e">310 <span style="font-size:13px;color:#3d5a7a">MW total</span></div>
+      <div class="sc-sub">AI <span id="sc-ai" style="font-family:'Share Tech Mono',monospace">0</span> MW + City 310 MW base load</div>
+      <div class="mr"><span class="mr-lbl">N-1 status</span><span id="n1-val" class="mr-val" style="color:#22c55e">SECURE</span></div>
+      <div class="mr"><span class="mr-lbl">Voltage stability margin</span><span id="vs-val" class="mr-val" style="color:#22c55e">100%</span></div>
+      <div class="mr"><span class="mr-lbl">Generation reserve</span><span id="rv-val" class="mr-val" style="color:#6b84a0">81%</span></div>
+      <div class="mr"><span class="mr-lbl">System demand</span><span id="sd-val" class="mr-val" style="color:#e2ecf6">310 MW</span></div>
+    </div>
+
+    <div class="panel" style="flex:1">
+      <span class="slbl">Operator Action</span>
+      <p id="op-action" style="font-size:13px;color:#8aa4be;line-height:1.6">No intervention required. All planning margins satisfied.</p>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: line meters -->
+  <div class="panel">
+    <span class="slbl">Line Thermal Loading</span>
+    <div id="line-meters"></div>
+  </div>
+
+</div>
+
+<!-- INSIGHT PANEL -->
+<div class="panel insight" id="insight-panel" style="border-color:rgba(34,197,94,.25)">
+  <div class="ins-icon" id="ins-icon" style="background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.3);color:#22c55e">✓</div>
+  <div style="flex:1">
+    <div class="ins-zone" id="ins-zone" style="color:#22c55e">ZONE 1 · NORMAL OPERATION</div>
+    <p class="ins-text" id="ins-text">All 400kV trunks below 60% thermal limit. N-1 criterion fully satisfied — the grid can lose any single line without violating supply. For context: a 200MW AI cluster consumes as much power as 200,000 Abu Dhabi homes.</p>
+  </div>
+</div>
+
+</main>
+
+<script>
+/* ── Constants ──────────────────────────────────────────────────── */
+const CITY = 310;
+const LIM  = {L1:650,L2:650,L3:400,L4:600,L5:600,L6:350};
+const LNAMES = {
+  L1:'Al Dhafra → North Sub (400kV)',
+  L2:'Al Dhafra → South Sub (400kV)',
+  L3:'N–S Interconnector (400kV)',
+  L4:'North Sub → AI Zone A (132kV)',
+  L5:'South Sub → AI Zone B (132kV)',
+  L6:'South Sub → City Load (132kV)'
+};
+
+/* ── Zone content ──────────────────────────────────────────────── */
+const ZONES = [null,
+  {
+    label:'Normal operation', icon:'✓', cl:'#22c55e', cbr:'rgba(34,197,94,.25)', cbg:'rgba(34,197,94,.08)',
+    action:'No intervention required. All planning margins satisfied.',
+    text:'All 400kV trunks below 60% thermal limit. N-1 criterion fully satisfied — the grid can lose any single line without violating supply. For context: a 200MW AI cluster consumes as much power as 200,000 Abu Dhabi homes.'
+  },
+  {
+    label:'South corridor loading', icon:'▲', cl:'#f59e0b', cbr:'rgba(245,158,11,.28)', cbg:'rgba(245,158,11,.07)',
+    action:'Pre-position switching orders. Review N-1 transfer capability. Monitor L3 interconnector headroom.',
+    text:'Lines L1 and L2 entering amber territory. The N-1 planning rule: if either trunk trips, the other must carry the full AI load plus city background via the interconnector. Post-fault loading on L1 is approaching 90% of its thermal limit — reserve is thin.'
+  },
+  {
+    label:'N-1 criterion violated', icon:'⚠', cl:'#f97316', cbr:'rgba(249,115,22,.3)', cbg:'rgba(249,115,22,.07)',
+    action:'TAQA Transmission must complete the Al Dhafra North 400kV corridor before AI load reaches this level. Escalate to planning team.',
+    text:'A single fault on L2 now causes L1 to exceed its 650MW thermal rating — this is an N-1 violation, prohibited under UAE Grid Code. The Al Dhafra OCGT is fully dispatched. The bottleneck is transmission path capacity, not generation. More OCGT cannot fix this. A second 400kV corridor is required.'
+  },
+  {
+    label:'Voltage stability critical', icon:'⚠', cl:'#ef4444', cbr:'rgba(239,68,68,.3)', cbg:'rgba(239,68,68,.07)',
+    action:'Emergency reactive compensation required. Under-voltage load-shedding relays armed. Notify EWEC grid operations immediately.',
+    text:'Voltage stability margin has fallen below 15%. IEEE standards require ≥20%. At this loading level, a reactive power shortfall can trigger a voltage collapse cascade — protection systems will automatically shed load before this point. The data centres go dark first.'
+  },
+  {
+    label:'Grid limit reached', icon:'⚠', cl:'#ef4444', cbr:'rgba(239,68,68,.38)', cbg:'rgba(239,68,68,.09)',
+    action:'Controlled load shedding initiated. Only solution: the dedicated 400kV AI transmission corridor TAQA Transmission is building.',
+    text:'The current grid architecture cannot safely carry this load. This is the engineering constraint that defines the timeline of the AED 36 billion programme. TAQA Transmission is the critical path for the UAE\'s AI strategy. What this team builds — or delays — determines whether the strategy is deliverable.'
+  }
+];
+
+/* ── State ─────────────────────────────────────────────────────── */
+let aiMW = 0, fault = null;
+
+/* ── Grid model ────────────────────────────────────────────────── */
+function calcGrid(ai, flt) {
+  let f;
+  if (!flt)
+    f = {L1:ai/2+155, L2:ai/2+155, L3:0,         L4:ai/2, L5:ai/2, L6:155};
+  else if (flt === 'L2')
+    f = {L1:ai+CITY,  L2:0,         L3:ai/2+155,  L4:ai/2, L5:ai/2, L6:155};
+  else
+    f = {L1:0,        L2:ai+CITY,   L3:ai/2+155,  L4:ai/2, L5:ai/2, L6:155};
+
+  const pct = {};
+  for (const k in f) pct[k] = +(f[k] / LIM[k] * 100).toFixed(1);
+
+  let n1 = 'SECURE';
+  if (flt) {
+    const ov = Object.entries(pct).some(([k,v]) => v > 100 && k !== flt);
+    n1 = ov ? 'OVERLOAD' : 'CONTINGENCY';
+  } else {
+    const l1n = (ai + CITY) / LIM.L1 * 100;
+    const l3n = (ai/2 + 155) / LIM.L3 * 100;
+    if (l1n > 100 || l3n > 100)      n1 = 'VIOLATED';
+    else if (l1n > 88 || l3n > 88)   n1 = 'AT RISK';
+  }
+
+  const maxPct  = Math.max(...Object.values(pct));
+  const vStab   = Math.max(0, Math.round(100 - maxPct * 0.73));
+  const total   = ai + CITY;
+  const solar   = Math.min(350, Math.round(total * 0.27));
+  const bess    = Math.min(160, Math.max(0, Math.round(ai * 0.17)));
+  const ocgt    = Math.max(0, total - solar - bess);
+  const reserve = Math.max(0, Math.round((1600 - total) / 1600 * 100));
+  const zone    = ai <= 200 ? 1 : ai <= 400 ? 2 : ai <= 600 ? 3 : ai <= 800 ? 4 : 5;
+
+  return {flows:f, pct, n1, vStab, gen:{solar,bess,ocgt}, reserve, zone, total};
+}
+
+/* ── Colour helpers ────────────────────────────────────────────── */
+function lineCol(p, flt) {
+  if (flt)    return '#2d4a6a';
+  if (p>=100) return '#ef4444';
+  if (p>=85)  return '#f97316';
+  if (p>=70)  return '#f59e0b';
+  if (p>2)    return '#22c55e';
+  return '#1e3a5f';
+}
+function n1Col(s) {
+  if (s==='VIOLATED'||s==='OVERLOAD')    return '#ef4444';
+  if (s==='AT RISK'||s==='CONTINGENCY') return '#f59e0b';
+  return '#22c55e';
+}
+function vsCol(v) { return v > 30 ? '#22c55e' : v > 15 ? '#f59e0b' : '#ef4444'; }
+
+/* ── Main update ───────────────────────────────────────────────── */
+function update() {
+  const S = calcGrid(aiMW, fault);
+  const Z = ZONES[S.zone];
+
+  /* header */
+  document.getElementById('hdr-mw').innerHTML = aiMW + '<span class="hdr-unit">MW</span>';
+  document.getElementById('hdr-mw').style.color = Z.cl;
+  const zb = document.getElementById('zone-badge');
+  zb.textContent = 'Zone ' + S.zone + ' · ' + Z.label;
+  zb.style.borderColor = Z.cbr; zb.style.background = Z.cbg; zb.style.color = Z.cl;
+
+  /* scale */
+  const h = aiMW > 0
+    ? aiMW + ' MW ≈ ' + Number(aiMW * 1000).toLocaleString() + ' homes'
+    : '0 MW — baseline city load only';
+  document.getElementById('scale-ref').textContent = h;
+
+  /* status card */
+  document.getElementById('status-card').style.borderColor = Z.cbr;
+  document.getElementById('sc-total').innerHTML = S.total + ' <span style="font-size:13px;color:#3d5a7a">MW total</span>';
+  document.getElementById('sc-total').style.color = Z.cl;
+  document.getElementById('sc-ai').textContent = aiMW;
+  const n1el = document.getElementById('n1-val');
+  n1el.textContent = S.n1; n1el.style.color = n1Col(S.n1);
+  const vsel = document.getElementById('vs-val');
+  vsel.textContent = S.vStab + '%'; vsel.style.color = vsCol(S.vStab);
+  const rvel = document.getElementById('rv-val');
+  rvel.textContent = S.reserve + '%'; rvel.style.color = S.reserve>30?'#6b84a0':S.reserve>15?'#f59e0b':'#ef4444';
+  document.getElementById('sd-val').textContent = S.total + ' MW';
+
+  /* generation */
+  document.getElementById('gen-total').textContent = S.total;
+  document.getElementById('gv-solar').textContent = S.gen.solar + ' MW';
+  document.getElementById('gb-solar').style.width = Math.min(100, S.gen.solar/350*100) + '%';
+  document.getElementById('gv-bess').textContent = S.gen.bess + ' MW';
+  document.getElementById('gb-bess').style.width = Math.min(100, S.gen.bess/160*100) + '%';
+  document.getElementById('gv-ocgt').textContent = S.gen.ocgt + ' MW';
+  document.getElementById('gb-ocgt').style.width = Math.min(100, S.gen.ocgt/1000*100) + '%';
+
+  /* action + insight */
+  document.getElementById('op-action').textContent = Z.action;
+  const ins = document.getElementById('insight-panel');
+  ins.style.borderColor = Z.cbr;
+  const ii = document.getElementById('ins-icon');
+  ii.textContent = Z.icon; ii.style.background = Z.cbg; ii.style.borderColor = Z.cbr; ii.style.color = Z.cl;
+  const iz = document.getElementById('ins-zone');
+  iz.textContent = 'ZONE ' + S.zone + ' · ' + Z.label.toUpperCase(); iz.style.color = Z.cl;
+  document.getElementById('ins-text').textContent = Z.text;
+
+  /* SVG lines */
+  ['L1','L2','L3','L4','L5','L6'].forEach(id => {
+    const flt = id === fault;
+    const p   = S.pct[id] || 0;
+    const mw  = Math.round(S.flows[id] || 0);
+    const col = lineCol(p, flt);
+
+    const bl = document.getElementById('bl-' + id);
+    bl.setAttribute('stroke', col);
+    if (flt) {
+      bl.setAttribute('stroke-dasharray', '7 5');
+      bl.setAttribute('opacity', '0.25');
+    } else {
+      bl.removeAttribute('stroke-dasharray');
+      bl.setAttribute('opacity', id === 'L6' ? '0.7' : '0.85');
+    }
+
+    const fl = document.getElementById('fl-' + id);
+    fl.setAttribute('stroke', col);
+    if (flt || p < 3) {
+      fl.style.opacity = '0';
+    } else {
+      fl.style.opacity = id === 'L6' ? '0.3' : '0.6';
+      fl.style.setProperty('--spd', Math.max(0.6, 3.8 - p/100*3.2) + 's');
+    }
+
+    const lt = document.querySelector('#ll-' + id + ' text');
+    lt.setAttribute('fill', flt ? '#2d4a6a' : col);
+    lt.textContent = id + ': ' + (flt ? '—' : mw + 'MW');
+  });
+
+  /* fault markers */
+  ['L1','L2'].forEach(id => {
+    document.getElementById('fx-' + id).style.display = fault === id ? '' : 'none';
+  });
+
+  /* AI pulse rings */
+  const pulse = aiMW > 50;
+  document.getElementById('pr-A').style.opacity = pulse ? '0.6' : '0';
+  document.getElementById('pr-B').style.opacity = pulse ? '0.6' : '0';
+
+  /* fault alert */
+  const fa = document.getElementById('fault-alert');
+  if (fault) {
+    fa.style.display = '';
+    const ov = Object.entries(S.pct)
+      .filter(([k,v]) => v > 100 && k !== fault)
+      .map(([k,v]) => k + ' at ' + Math.round(v) + '%');
+    fa.textContent = '⚠ ' + fault + ' TRIPPED · ' +
+      (ov.length ? 'OVERLOAD — ' + ov.join(', ') : 'Contingency active — no thermal violations');
+  } else {
+    fa.style.display = 'none';
+  }
+
+  /* line meters */
+  const el = document.getElementById('line-meters');
+  el.innerHTML = '';
+  ['L1','L2','L3','L4','L5','L6'].forEach(id => {
+    const flt = id === fault;
+    const p   = S.pct[id] || 0;
+    const mw  = Math.round(S.flows[id] || 0);
+    const col = lineCol(p, flt);
+    const d   = document.createElement('div');
+    d.className = 'lbrow';
+    d.innerHTML =
+      '<div class="lb-top">' +
+        '<span class="lb-name">' + LNAMES[id] + '</span>' +
+        '<span class="lb-val" style="color:' + (flt ? '#2d4a6a' : col) + '">' + (flt ? 'TRIPPED' : Math.round(p) + '%') + '</span>' +
+      '</div>' +
+      '<div class="lb-sub">' + (flt ? '— / ' + LIM[id] + ' MW' : mw + ' / ' + LIM[id] + ' MW') + '</div>' +
+      '<div class="lb-track"><div class="lb-fill" style="width:' + (flt ? 0 : Math.min(100, p)) + '%;background:' + col + '"></div></div>';
+    el.appendChild(d);
+  });
+
+  /* preset highlight */
+  document.querySelectorAll('.pb').forEach(b => {
+    b.classList.toggle('active', parseInt(b.textContent) === aiMW);
+  });
+}
+
+/* ── Event handlers ────────────────────────────────────────────── */
+function onSlider(v) {
+  aiMW = parseInt(v);
+  update();
+}
+
+function setLoad(v) {
+  aiMW = v;
+  document.getElementById('ai-slider').value = v;
+  update();
+}
+
+function toggleFault(line) {
+  fault = fault === line ? null : line;
+  ['L1', 'L2'].forEach(l => {
+    const btn = document.getElementById('fb-' + l);
+    const on  = fault === l;
+    btn.classList.toggle('active', on);
+    btn.textContent = on
+      ? '✕  Clear fault on ' + l + ' · ' + (l === 'L1' ? 'North' : 'South') + ' 400kV trunk'
+      : '⚡ Trip ' + l + ' · ' + (l === 'L1' ? 'North' : 'South') + ' 400kV trunk';
+  });
+  update();
+}
+
+/* ── Init ──────────────────────────────────────────────────────── */
+update();
+</script>
+
+</body>
+</html>

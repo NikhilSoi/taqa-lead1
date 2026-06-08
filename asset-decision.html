@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Asset Decision Simulator — TAQA LEAD</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+  :root {
+    --bg:        #00083F;
+    --panel:     #020B4A;
+    --panel2:    #040F5C;
+    --border:    #0D1E70;
+    --border2:   #1A2E80;
+    --orange:    #FF5F01;
+    --orange-dk: #CC4500;
+    --orange-dim:#3D1600;
+    --white:     #FFFFFF;
+    --muted:     #7A96C4;
+    --dim:       #3A5090;
+    --green:     #22C55E;
+    --amber:     #F59E0B;
+    --red:       #EF4444;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--white);
+    font-family: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── HEADER ─────────────────────────────────────────────────────── */
+  .hdr {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .hdr-left { display:flex; align-items:center; gap:14px; }
+  .hdr-pill {
+    background: var(--orange);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .hdr-title { font-size: 16px; font-weight: 700; }
+  .hdr-sub   { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .hdr-right { font-size: 10px; color: var(--dim); font-family: 'IBM Plex Mono', monospace; }
+
+  /* ── BODY GRID ──────────────────────────────────────────────────── */
+  .body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    grid-template-rows: 1fr 54px;
+    overflow: hidden;
+  }
+
+  /* ── PANELS ─────────────────────────────────────────────────────── */
+  .pnl {
+    padding: 18px 22px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border2) transparent;
+  }
+  .pnl-left  { background: var(--panel); border-right: 1px solid var(--border); }
+  .pnl-right { background: var(--bg); }
+
+  /* ── CASE CARD ───────────────────────────────────────────────────── */
+  .case-card {
+    background: var(--orange-dim);
+    border: 1px solid var(--orange);
+    border-left: 3px solid var(--orange);
+    border-radius: 5px;
+    padding: 10px 14px;
+    margin-bottom: 18px;
+  }
+  .case-lbl { font-size: 9px; color: var(--orange); font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 3px; font-family: 'IBM Plex Mono', monospace; }
+  .case-name { font-size: 14px; font-weight: 700; }
+  .case-sub  { font-size: 10px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+
+  /* ── SECTION LABEL ───────────────────────────────────────────────── */
+  .sec-lbl {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--orange);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    margin-top: 16px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .sec-lbl:first-of-type { margin-top: 0; }
+
+  /* ── FIELDS ──────────────────────────────────────────────────────── */
+  .field       { margin-bottom: 13px; }
+  .field-lbl   { font-size: 11px; color: var(--muted); margin-bottom: 5px; display:flex; justify-content:space-between; }
+  .field-val   { color: var(--white); font-weight: 600; font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+  .field-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%; height: 4px;
+    background: var(--border2);
+    border-radius: 2px; outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    background: var(--orange);
+    cursor: pointer;
+    transition: transform .15s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+  select {
+    width: 100%;
+    background: var(--panel2);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    color: var(--white);
+    padding: 7px 10px;
+    font-size: 12px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    outline: none; cursor: pointer;
+    transition: border-color .15s;
+  }
+  select:focus { border-color: var(--orange); }
+  select option { background: #020B4A; }
+
+  /* ── BOTTOM BAR ──────────────────────────────────────────────────── */
+  .bottom-bar {
+    grid-column: 1 / 3;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 20px;
+  }
+  .scen-lbl {
+    font-size: 9px; color: var(--dim); font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase; white-space: nowrap;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .scen-btns { display:flex; gap:6px; flex:1; }
+
+  .btn-scen {
+    background: transparent;
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    color: var(--muted);
+    padding: 6px 14px;
+    font-size: 11px; font-weight: 600;
+    font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .btn-scen:hover  { border-color: var(--orange); color: var(--orange); }
+  .btn-scen.active { border-color: var(--orange); color: var(--orange); background: rgba(255,95,1,.08); }
+
+  .btn-gen {
+    background: var(--orange);
+    border: none; border-radius: 4px;
+    color: #fff;
+    padding: 8px 22px;
+    font-size: 12px; font-weight: 700;
+    font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+    transition: background .15s;
+    white-space: nowrap;
+    letter-spacing: .3px;
+  }
+  .btn-gen:hover    { background: var(--orange-dk); }
+  .btn-gen:disabled { background: var(--border2); cursor: not-allowed; color: var(--dim); }
+
+  /* ── OUTPUT STATES ───────────────────────────────────────────────── */
+  .state { display:none; }
+  .state.on {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  #st-placeholder {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+    color: var(--dim);
+  }
+  .ph-icon { font-size: 40px; opacity: .35; }
+  .ph-txt  { font-size: 13px; line-height: 1.6; max-width: 280px; }
+
+  #st-loading {
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+  .spinner {
+    width: 34px; height: 34px;
+    border: 2px solid var(--border2);
+    border-top-color: var(--orange);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .load-txt { font-size: 12px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+
+  /* ── RESULTS ─────────────────────────────────────────────────────── */
+  #st-results {
+    padding: 18px 22px;
+    gap: 12px;
+    overflow-y: auto;
+  }
+
+  /* Verdict banner */
+  .verd-banner {
+    border-radius: 6px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .verd-banner.replace  { background:linear-gradient(135deg,#4A0A0A,#1A0303); border:1px solid #EF4444; }
+  .verd-banner.refurbish{ background:linear-gradient(135deg,#3D1F00,#1A0A00); border:1px solid #F59E0B; }
+  .verd-banner.repair   { background:linear-gradient(135deg,#052E16,#011A0A); border:1px solid #22C55E; }
+
+  .verd-word {
+    font-size: 30px; font-weight: 700; letter-spacing: 2px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .verd-banner.replace  .verd-word  { color: #FCA5A5; }
+  .verd-banner.refurbish .verd-word { color: #FCD34D; }
+  .verd-banner.repair   .verd-word  { color: #86EFAC; }
+
+  .verd-right { text-align: right; }
+  .conf-micro { font-size: 9px; color: rgba(255,255,255,.4); letter-spacing: 1px; margin-bottom: 5px; font-family:'IBM Plex Mono',monospace; }
+  .conf-badge {
+    font-size: 10px; font-weight: 700; padding: 3px 8px;
+    border-radius: 2px; letter-spacing: 1px; text-transform: uppercase;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* Cost table */
+  .cost-tbl {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    flex-shrink: 0;
+  }
+  .cost-hdr {
+    font-size: 9px; color: var(--orange); font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .cost-row { display:flex; align-items:center; gap:10px; margin-bottom: 7px; }
+  .cost-lbl { font-size: 11px; color: var(--muted); width: 74px; flex-shrink: 0; }
+  .cost-track { flex:1; height: 7px; background: var(--border2); border-radius: 3px; overflow: hidden; }
+  .cost-fill { height:100%; border-radius:3px; transition: width .7s cubic-bezier(.4,0,.2,1), opacity .4s; }
+  .cost-val { font-size: 11px; font-weight: 700; width: 66px; text-align: right; flex-shrink: 0; font-family:'IBM Plex Mono',monospace; }
+  .cost-note {
+    font-size: 9px; color: var(--dim); margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid var(--border); font-style: italic; line-height: 1.4;
+  }
+
+  /* Reasoning card */
+  .reason-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--orange);
+    border-radius: 6px;
+    padding: 12px 16px;
+    flex-shrink: 0;
+  }
+  .card-lbl { font-size: 9px; color: var(--orange); font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; font-family:'IBM Plex Mono',monospace; }
+  .card-txt { font-size: 12px; color: #C8D4E8; line-height: 1.65; }
+
+  /* Info grid */
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; flex-shrink:0; }
+  .info-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 11px 14px;
+  }
+  .info-card.wide { grid-column: 1/3; }
+
+  /* Error */
+  .err-card {
+    background: #2D0A0A; border:1px solid var(--red);
+    border-radius:6px; padding:14px; color:#FCA5A5; font-size:12px; line-height:1.5;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="hdr-pill">TAQA LEAD</div>
+    <div>
+      <div class="hdr-title">Asset Decision Simulator</div>
+      <div class="hdr-sub">Module 2 · Day 2 · Repair, Refurbish, or Replace?</div>
+    </div>
+  </div>
+  <div class="hdr-right">AI-assisted · For facilitation use</div>
+</div>
+
+<!-- BODY -->
+<div class="body">
+
+  <!-- LEFT: INPUTS -->
+  <div class="pnl pnl-left">
+
+    <div class="case-card">
+      <div class="case-lbl">Active Case</div>
+      <div class="case-name">Protection Relay — Substation 7</div>
+      <div class="case-sub">Numerical Distance Protection · 400kV · 18 yrs service · No N-1 backup on this corridor</div>
+    </div>
+
+    <div class="sec-lbl">Asset Condition</div>
+
+    <div class="field">
+      <div class="field-lbl">Asset Age <span class="field-val" id="d-age">18 yrs</span></div>
+      <input type="range" id="age" min="1" max="40" value="18"
+        oninput="d('age',this.value+' yrs')">
+    </div>
+
+    <div class="field">
+      <div class="field-lbl">Annual Maintenance Cost <span class="field-val" id="d-maint">AED 45,000</span></div>
+      <input type="range" id="maint" min="5" max="200" value="45"
+        oninput="d('maint','AED '+(this.value*1000).toLocaleString())">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <div class="field-lbl">Cost Trend</div>
+        <select id="trend">
+          <option value="stable">Stable</option>
+          <option value="plus10">+10% / yr</option>
+          <option value="plus20" selected>+20% / yr</option>
+          <option value="plus50">+50% / yr</option>
+        </select>
+      </div>
+      <div class="field">
+        <div class="field-lbl">Fault Frequency</div>
+        <select id="faults">
+          <option value="none">None recorded</option>
+          <option value="occasional">Occasional</option>
+          <option value="increasing" selected>Increasing</option>
+          <option value="frequent">Frequent</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <div class="field-lbl">OEM Support</div>
+        <select id="oem">
+          <option value="full">Full support</option>
+          <option value="limited">Limited</option>
+          <option value="ending" selected>Ending Dec 2026</option>
+          <option value="ended">Already ended</option>
+        </select>
+      </div>
+      <div class="field">
+        <div class="field-lbl">Network Criticality</div>
+        <select id="crit">
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high" selected>High</option>
+          <option value="critical">Critical</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sec-lbl">Financial Parameters</div>
+
+    <div class="field-row">
+      <div class="field">
+        <div class="field-lbl">Replacement Cost <span class="field-val" id="d-replace">AED 280K</span></div>
+        <input type="range" id="replace" min="50" max="1000" value="280"
+          oninput="d('replace','AED '+this.value+'K')">
+      </div>
+      <div class="field">
+        <div class="field-lbl">Lead Time <span class="field-val" id="d-lead">9 months</span></div>
+        <input type="range" id="lead" min="1" max="24" value="9"
+          oninput="d('lead',this.value+' months')">
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: OUTPUT -->
+  <div class="pnl pnl-right" style="padding:0; position:relative;">
+
+    <!-- PLACEHOLDER -->
+    <div id="st-placeholder" class="state on">
+      <div class="ph-icon">⚡</div>
+      <div class="ph-txt">Select a scenario preset below or adjust the parameters, then click <strong>Generate Recommendation</strong></div>
+    </div>
+
+    <!-- LOADING -->
+    <div id="st-loading" class="state">
+      <div class="spinner"></div>
+      <div class="load-txt">Analysing asset data…</div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="st-results" class="state">
+
+      <div class="verd-banner" id="v-banner">
+        <div>
+          <div style="font-size:9px;color:rgba(255,255,255,.35);letter-spacing:1.5px;margin-bottom:4px;font-family:'IBM Plex Mono',monospace;">RECOMMENDATION</div>
+          <div class="verd-word" id="v-word">—</div>
+        </div>
+        <div class="verd-right">
+          <div class="conf-micro">CONFIDENCE</div>
+          <div class="conf-badge" id="v-conf">—</div>
+        </div>
+      </div>
+
+      <div class="cost-tbl">
+        <div class="cost-hdr">3-Year Cost Comparison (Indicative, AED)</div>
+        <div class="cost-row">
+          <div class="cost-lbl">Repair</div>
+          <div class="cost-track"><div class="cost-fill" id="bar-r" style="background:#3B82F6;width:0%"></div></div>
+          <div class="cost-val" id="val-r" style="color:#93C5FD">—</div>
+        </div>
+        <div class="cost-row">
+          <div class="cost-lbl">Refurbish</div>
+          <div class="cost-track"><div class="cost-fill" id="bar-f" style="background:#F59E0B;width:0%"></div></div>
+          <div class="cost-val" id="val-f" style="color:#FCD34D">—</div>
+        </div>
+        <div class="cost-row">
+          <div class="cost-lbl">Replace</div>
+          <div class="cost-track"><div class="cost-fill" id="bar-p" style="background:#EF4444;width:0%"></div></div>
+          <div class="cost-val" id="val-p" style="color:#FCA5A5">—</div>
+        </div>
+        <div class="cost-note">Excludes failure event cost. One wide-area outage event on an unprotected corridor = AED 500K – 2M+.</div>
+      </div>
+
+      <div class="reason-card">
+        <div class="card-lbl">Reasoning</div>
+        <div class="card-txt" id="v-reason">—</div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <div class="card-lbl">Decision Driver</div>
+          <div class="card-txt" id="v-driver">—</div>
+        </div>
+        <div class="info-card">
+          <div class="card-lbl">Key Risk</div>
+          <div class="card-txt" id="v-risk">—</div>
+        </div>
+        <div class="info-card wide">
+          <div class="card-lbl">What Would Change This Recommendation</div>
+          <div class="card-txt" id="v-change">—</div>
+        </div>
+      </div>
+
+      <!-- Error inside results panel -->
+      <div id="v-err" style="display:none;">
+        <div class="err-card" id="v-err-msg"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div class="bottom-bar">
+    <div class="scen-lbl">Scenarios →</div>
+    <div class="scen-btns">
+      <button class="btn-scen" id="sb-base"      onclick="loadScen('base',this)">📋 Base Case</button>
+      <button class="btn-scen" id="sb-optimistic" onclick="loadScen('optimistic',this)">📈 Optimistic</button>
+      <button class="btn-scen" id="sb-worst"     onclick="loadScen('worst',this)">⚠️ Worst Case</button>
+      <button class="btn-scen" id="sb-custom"    onclick="loadScen('custom',this)">✏️ Custom</button>
+    </div>
+    <button class="btn-gen" id="btn-gen" onclick="generate()">Generate Recommendation →</button>
+  </div>
+
+</div>
+
+<script>
+// ── Helpers ──────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+function d(key, txt) { $('d-'+key).textContent = txt; }
+
+function setRange(id, val, dispId, fmt) {
+  $(id).value = val;
+  $(dispId).textContent = fmt(val);
+}
+
+function showState(name) {
+  ['placeholder','loading','results'].forEach(s => {
+    const el = $('st-'+s);
+    el.classList.remove('on');
+    el.style.display = 'none';
+  });
+  const t = $('st-'+name);
+  t.style.display = 'flex';
+  t.classList.add('on');
+}
+
+// ── Scenarios ─────────────────────────────────────────────────────────────────
+const SCEN = {
+  base:       { age:18, maint:45, trend:'plus20', faults:'increasing', oem:'ending',  crit:'high',     replace:280, lead:9  },
+  optimistic: { age:18, maint:40, trend:'plus10', faults:'occasional', oem:'ending',  crit:'high',     replace:280, lead:9  },
+  worst:      { age:18, maint:60, trend:'plus50', faults:'frequent',   oem:'ended',   crit:'critical', replace:280, lead:9  },
+};
+
+function loadScen(name, btn) {
+  document.querySelectorAll('.btn-scen').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (name === 'custom') return;
+  const s = SCEN[name];
+  setRange('age',     s.age,     'd-age',     v => v + ' yrs');
+  setRange('maint',   s.maint,   'd-maint',   v => 'AED ' + (v*1000).toLocaleString());
+  setRange('replace', s.replace, 'd-replace', v => 'AED ' + v + 'K');
+  setRange('lead',    s.lead,    'd-lead',    v => v + ' months');
+  $('trend').value  = s.trend;
+  $('faults').value = s.faults;
+  $('oem').value    = s.oem;
+  $('crit').value   = s.crit;
+}
+
+// ── Cost calculation ──────────────────────────────────────────────────────────
+function calcCosts(p) {
+  const trendRate = { stable:0, plus10:.10, plus20:.20, plus50:.50 }[p.trend];
+
+  // Repair: ~25K capex + 3 years O&M at trend
+  let om = 0, c = p.maint;
+  for(let y=0;y<3;y++){ om += c; c *= (1+trendRate); }
+  const repair3 = 25 + om;
+
+  // Refurbish: ~90K capex + 3 years at 55% of current maint (stable post-refurb)
+  const refurb3 = 90 + (p.maint * 0.55 * 3);
+
+  // Replace: full capital + AED 12K/yr
+  const replace3 = p.replace + (12 * 3);
+
+  return { repair3, refurb3, replace3 };
+}
+
+function fmtK(k) {
+  return k >= 1000 ? 'AED '+(k/1000).toFixed(1)+'M' : 'AED '+Math.round(k)+'K';
+}
+
+// ── Build AI prompt ───────────────────────────────────────────────────────────
+function buildPrompt(p, costs) {
+  const trendLbl  = { stable:'stable', plus10:'+10%/yr', plus20:'+20%/yr', plus50:'+50%/yr' };
+  const faultLbl  = { none:'none recorded', occasional:'occasional (1–2 events, root cause resolved)', increasing:'increasing (3+ spurious trips, root cause inconclusive)', frequent:'frequent (multiple per year, root cause unknown)' };
+  const oemLbl    = { full:'full OEM support active', limited:'limited — spares only', ending:'support ending Dec 2026 — no firmware or parts after that date', ended:'OEM support has ended — third-party parts only, no firmware updates' };
+  const critLbl   = { low:'low (redundant paths available)', medium:'medium (partial redundancy)', high:'high (no N-1 backup on this corridor)', critical:'critical (single point of failure — failure triggers wide-area outage)' };
+
+  return `You are a senior asset management engineer at a transmission utility assessing a critical asset.
+
+ASSET: Numerical Distance Protection Relay, 400kV substation, no N-1 redundancy on this corridor.
+
+PARAMETERS:
+- Age: ${p.age} years (design life 20–25 years)
+- Annual maintenance cost: AED ${p.maint},000
+- Maintenance cost trend: ${trendLbl[p.trend]}
+- Fault/spurious trip history: ${faultLbl[p.faults]}
+- OEM support: ${oemLbl[p.oem]}
+- Network criticality: ${critLbl[p.crit]}
+- Full replacement cost: AED ${p.replace},000
+- Replacement procurement lead time: ${p.lead} months
+
+INDICATIVE 3-YEAR COSTS (capital + O&M, excluding failure event risk):
+- Repair path: AED ${Math.round(costs.repair3)}K
+- Refurbish path: AED ${Math.round(costs.refurb3)}K
+- Replace path: AED ${Math.round(costs.replace3)}K
+- One wide-area outage event on this corridor: AED 500K–2M+
+
+DECISION REQUIRED: Repair (fix current fault only), Refurbish (major component overhaul), or Replace (full system renewal).
+
+Respond with ONLY valid JSON — no preamble, no markdown fences:
+{
+  "verdict": "REPAIR" or "REFURBISH" or "REPLACE",
+  "confidence": "High" or "Medium" or "Low",
+  "reasoning": "2–3 sentences linking the financial and operational data directly to the verdict. Be specific about the numbers.",
+  "decision_driver": "One sentence naming the single most important factor.",
+  "key_risk": "One sentence on the primary risk if this recommendation is not followed.",
+  "what_would_change": "One sentence naming the specific condition that would change this verdict."
+}`;
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderResults(data, costs) {
+  const v = (data.verdict||'REPLACE').toLowerCase();
+  $('v-err').style.display = 'none';
+
+  // Verdict
+  const banner = $('v-banner');
+  banner.className = 'verd-banner ' + v;
+  $('v-word').textContent = (data.verdict||'REPLACE').toUpperCase();
+
+  // Confidence
+  const conf = data.confidence || 'Medium';
+  const confColor = {High:'#22C55E', Medium:'#F59E0B', Low:'#EF4444'}[conf];
+  const cb = $('v-conf');
+  cb.textContent = conf.toUpperCase() + ' CONFIDENCE';
+  cb.style.background = confColor + '25';
+  cb.style.color = confColor;
+  cb.style.border = '1px solid ' + confColor + '60';
+
+  // Cost bars
+  const max = Math.max(costs.repair3, costs.refurb3, costs.replace3);
+  function setBar(barId, valId, cost, dim) {
+    $(barId).style.width  = (cost/max*100) + '%';
+    $(barId).style.opacity = dim ? '0.3' : '1';
+    $(valId).textContent  = fmtK(cost);
+  }
+  setBar('bar-r','val-r', costs.repair3,  v !== 'repair');
+  setBar('bar-f','val-f', costs.refurb3,  v !== 'refurbish');
+  setBar('bar-p','val-p', costs.replace3, v !== 'replace');
+
+  // Text
+  $('v-reason').textContent = data.reasoning     || '—';
+  $('v-driver').textContent = data.decision_driver || '—';
+  $('v-risk').textContent   = data.key_risk       || '—';
+  $('v-change').textContent = data.what_would_change || '—';
+
+  showState('results');
+}
+
+// ── Main generate ─────────────────────────────────────────────────────────────
+async function generate() {
+  const p = {
+    age:     +$('age').value,
+    maint:   +$('maint').value,
+    trend:   $('trend').value,
+    faults:  $('faults').value,
+    oem:     $('oem').value,
+    crit:    $('crit').value,
+    replace: +$('replace').value,
+    lead:    +$('lead').value,
+  };
+
+  const costs = calcCosts(p);
+  const prompt = buildPrompt(p, costs);
+
+  showState('loading');
+  $('btn-gen').disabled = true;
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        system: 'You are a senior asset management engineer at a high-voltage transmission utility. You provide precise, defensible repair/refurbish/replace recommendations based on operational and financial data. Respond only with valid JSON — no preamble, no markdown fences.',
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!res.ok) throw new Error('HTTP ' + res.status + ' from /api/chat');
+    const raw = await res.json();
+    const txt = raw.content?.[0]?.text || '';
+    const clean = txt.replace(/```json|```/g, '').trim();
+    const data = JSON.parse(clean);
+    renderResults(data, costs);
+
+  } catch(err) {
+    // Show error inside results panel
+    showState('results');
+    $('v-banner').className = 'verd-banner replace';
+    $('v-word').textContent = 'ERROR';
+    $('v-conf').textContent = '';
+    $('v-err-msg').textContent = 'Could not generate recommendation: ' + err.message;
+    $('v-err').style.display = 'block';
+  } finally {
+    $('btn-gen').disabled = false;
+  }
+}
+</script>
+</body>
+</html>
